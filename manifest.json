@@ -1,0 +1,25 @@
+{
+  "name": "Koenigs Drinks CRM",
+  "short_name": "Koenigs CRM",
+  "description": "Koenigs Food & Drinks GmbH — Müşteri Takip Sistemi",
+  "start_url": "/koenigs-crm/",
+  "scope": "/koenigs-crm/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6B2D3E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
