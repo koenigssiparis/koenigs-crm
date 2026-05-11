@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6B2D3E">
+<title>Koenigs Drinks CRM</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#d0cfc7;border-radius:3px}
+.header{background:#fff;border-bottom:1px solid #e8e6df;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header-logo{font-size:15px;font-weight:600;color:#6B2D3E;letter-spacing:-.3px}
+.header-sub{font-size:11px;color:#999}
+.content{flex:1;overflow-y:auto}
+.nav{background:#fff;border-top:1px solid #e8e6df;display:flex;flex-shrink:0}
+.nav-btn{flex:1;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:10px;color:#aaa;transition:color .15s;font-family:inherit}
+.nav-btn.active{color:#6B2D3E;font-weight:500}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* Cards */
+.card{background:#fff;border:1px solid #e8e6df;border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.card-tap{cursor:pointer;transition:opacity .1s;-webkit-user-select:none}
+.card-tap:active{opacity:.7}
+.section-label{padding:12px 16px 5px;font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.06em}
+/* Badges */
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge-rest{background:#e1f5ee;color:#0f6e56}
+.badge-get{background:#e6f1fb;color:#185fa5}
+.badge-hot{background:#faeeda;color:#854f0b}
+.badge-dig{background:#f1efe8;color:#5f5e5a}
+.badge-a{background:#fcebeb;color:#a32d2d;font-weight:700}
+.badge-b{background:#faeeda;color:#854f0b}
+.badge-c{background:#f1efe8;color:#5f5e5a}
+.badge-nrw{background:#eeedfe;color:#534ab7}
+.badge-status{padding:3px 6px;border-radius:12px;font-size:10px;border:none;cursor:pointer;font-family:inherit;outline:none;flex-shrink:0;max-width:108px}
+/* Input */
+input[type=text],select,textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid #e0ddd5;border-radius:8px;background:#f8f7f4;color:#1a1a18;outline:none;font-family:inherit}
+input[type=text]:focus,select:focus{border-color:#6B2D3E;background:#fff}
+textarea{resize:none}
+/* Pills */
+.pills{overflow-x:auto;white-space:nowrap;padding:8px 16px 8px 16px;background:#fff;border-bottom:1px solid #e8e6df;-ms-overflow-style:none;scrollbar-width:none}
+.pills::after{content:'';display:inline-block;width:24px;flex-shrink:0}
+.pills::-webkit-scrollbar{display:none}
+.pill{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #e0ddd5;margin-right:6px;background:transparent;color:#888;font-family:inherit;transition:all .15s}
+.pill.on{background:#6B2D3E;color:#fff;border-color:#6B2D3E;font-weight:500}
+/* Top sticky search area */
+.search-bar{background:#fff;border-bottom:1px solid #e8e6df;padding:10px 16px;position:sticky;top:0;z-index:5}
+/* Stat cards */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0}
+.stat{background:#fff;border:1px solid #e8e6df;border-radius:10px;padding:12px}
+.stat-val{font-size:24px;font-weight:600;color:#6B2D3E;margin:4px 0 2px}
+.stat-label{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.04em}
+.stat-sub{font-size:11px;color:#bbb}
+/* Day tabs */
+.day-tabs{display:flex;gap:6px;padding:10px 16px;background:#fff;border-bottom:1px solid #e8e6df;flex-shrink:0}
+.day-tab{flex:1;padding:7px 2px;font-size:11px;border-radius:8px;cursor:pointer;text-align:center;border:1px solid #e0ddd5;background:transparent;color:#888;font-family:inherit;transition:all .15s}
+/* Product tabs */
+.prod-tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #e8e6df}
+.prod-tab{flex:1;padding:9px;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;text-align:center;border:1px solid #e0ddd5;background:transparent;color:#888;font-family:inherit;transition:all .15s}
+.prod-tab.on{background:#6B2D3E;color:#fff;border-color:#6B2D3E}
+/* Strategy box */
+.strategy{border-left:3px solid #6B2D3E;background:#fff;padding:12px 14px;border-radius:0 10px 10px 0;margin-bottom:8px}
+/* Priority indicator */
+.prio-a{border-left:3px solid #e24b4a}
+.prio-b{border-left:3px solid #ba7517}
+.prio-c{border-left:3px solid #888}
+/* Back button */
+.back-btn{font-size:20px;background:none;border:none;cursor:pointer;color:#6B2D3E;padding:0;line-height:1;margin-right:4px}
+/* Visit form */
+.form-label{display:block;font-size:12px;color:#888;margin-bottom:4px}
+.form-row{margin-bottom:10px}
+.btn-save{width:100%;padding:11px;font-size:13px;font-weight:600;background:#6B2D3E;color:#fff;border:none;border-radius:8px;cursor:pointer}
+.btn-ghost{padding:9px 16px;font-size:13px;border:1px solid #e0ddd5;border-radius:8px;background:none;color:#888;cursor:pointer;font-family:inherit}
+.btn-add{width:100%;padding:12px;font-size:13px;font-weight:500;border:1px dashed #c0bdb5;border-radius:10px;background:none;cursor:pointer;color:#888;font-family:inherit;margin-top:4px}
+/* Visit result badges */
+.r-Sipariş{background:#eaf3de;color:#3b6d11}
+.r-Takip{background:#faeeda;color:#854f0b}
+.r-İlgisiz{background:#fcebeb;color:#a32d2d}
+.r-Yoktu{background:#f1efe8;color:#5f5e5a}
+/* Placeholder */
+.empty{text-align:center;padding:32px 20px;color:#bbb;font-size:13px;line-height:1.7}
+/* Contact info */
+.contact-row{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid #f0ede8;font-size:12px;width:100%}
+.contact-key{color:#999;min-width:55px;flex-shrink:0}
+.contact-val{color:#1a1a18;flex:1;min-width:0;word-break:break-word;overflow-wrap:break-word}
+.contact-val a{color:#6B2D3E;text-decoration:none;word-break:break-all}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">🍷 Koenigs Drinks CRM</div>
+  </div>
+  <span id="sync-indicator" style="font-size:13px;color:#bbb;cursor:help;margin-right:4px" title="Sheets bağlantısı">●</span><div class="header-sub" id="hdr-sub">v2.0</div>
+</div>
+
+<div class="content" id="content"></div>
+
+<nav class="nav" id="nav">
+  <button class="nav-btn active" id="nb-dashboard" onclick="setTab('dashboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Ana Sayfa
+  </button>
+  <button class="nav-btn" id="nb-customers" onclick="setTab('customers')">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
+    Müşteriler
+  </button>
+  <button class="nav-btn" id="nb-routes" onclick="setTab('routes')">
+    <svg viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M6 12V5a3 3 0 0 1 3-3h6"/><path d="M21 12v7a3 3 0 0 1-3 3H6"/></svg>
+    Rota
+  </button>
+  <button class="nav-btn" id="nb-products" onclick="setTab('products')">
+    <svg viewBox="0 0 24 24"><path d="M8 3l-2 5h12L16 3"/><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>
+    Ürünler
+  </button>
+  <button class="nav-btn" id="nb-potentials" onclick="setTab('potentials')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    Hedefler
+  </button>
+</nav>
+
+<script>
+
+// ====== GOOGLE SHEETS SYNC ======
+const API = 'https://script.google.com/macros/s/AKfycbxH45N7dmQ-vQEQOKb81PjbGmTrJLsFB-1awvgutbNFeqjcOvUlMz4lT1c5QPKEBPCs/exec';
+
+function apiCall(params, onSuccess, onError) {
+  const qs = Object.entries(params).map(function(kv) {
+    return kv[0] + '=' + encodeURIComponent(typeof kv[1] === 'object' ? JSON.stringify(kv[1]) : kv[1]);
+  }).join('&');
+  fetch(API + '?' + qs)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.error) { if(onError) onError(data.error); }
+      else { if(onSuccess) onSuccess(data); }
+    })
+    .catch(function(err){ if(onError) onError(err.toString()); });
+}
+
+function setSyncStatus(status) {
+  var el = document.getElementById('sync-indicator');
+  if (!el) return;
+  var map = {
+    idle:    {text:'●', color:'#bbb', title:'Bağlantı bekleniyor'},
+    syncing: {text:'↻', color:'#ba7517', title:'Senkronize ediliyor...'},
+    ok:      {text:'●', color:'#3b6d11', title:'Google Sheets ile senkronize'},
+    error:   {text:'●', color:'#e24b4a', title:'Bağlantı hatası — veriler lokal kaydedildi'}
+  };
+  var st = map[status] || map.idle;
+  el.textContent = st.text;
+  el.style.color = st.color;
+  el.title = st.title;
+}
+
+function loadFromSheets() {
+  setSyncStatus('syncing');
+  apiCall({action:'getVisits'}, function(data) {
+    if (data.visits && data.visits.length) {
+      data.visits.forEach(function(v) {
+        var cid = Number(v.customerId);
+        if (!state.visits[cid]) state.visits[cid] = [];
+        if (!state.visits[cid].find(function(x){ return x.id == v.id; })) {
+          state.visits[cid].push({id: v.id, date: v.date, result: v.result, note: v.note || ''});
+        }
+      });
+    }
+    setSyncStatus('ok');
+    render();
+  }, function(err) {
+    setSyncStatus('error');
+    console.warn('Sheets error:', err);
+  });
+
+  apiCall({action:'getManualPots'}, function(data) {
+    if (data.potentials && data.potentials.length) {
+      manualPotentials = data.potentials.map(function(p) {
+        return {
+          id: p.id, cat: p.cat, name: p.name, city: p.city,
+          addr: p.addr || '', phone: p.phone || '', email: p.email || '',
+          contact: p.contact || '', buying: p.buying || '', note: p.note || '',
+          prio: p.prio || 'B', status: p.status || 'Aranmadı',
+          nrw: p.nrw === 'true' || p.nrw === true
+        };
+      });
+    }
+  }, function(){});
+}
+
+function saveVisitToSheets(customerId, visit) {
+  setSyncStatus('syncing');
+  apiCall({
+    action: 'saveVisit',
+    id: visit.id,
+    customerId: customerId,
+    date: visit.date,
+    result: visit.result,
+    note: visit.note || ''
+  }, function(){ setSyncStatus('ok'); }, function(){ setSyncStatus('error'); });
+}
+
+function saveManualPotToSheets(pot) {
+  setSyncStatus('syncing');
+  apiCall({
+    action: 'saveManualPot',
+    id: pot.id, cat: pot.cat, name: pot.name, city: pot.city,
+    addr: pot.addr || '', phone: pot.phone || '', email: pot.email || '',
+    contact: pot.contact || '', buying: pot.buying || '', note: pot.note || '',
+    prio: pot.prio, status: pot.status, nrw: pot.nrw
+  }, function(){ setSyncStatus('ok'); }, function(){ setSyncStatus('error'); });
+}
+
+function savePotStatusToSheets(id, status) {
+  apiCall({action:'updatePotStatus', id: id, status: status},
+    function(){ setSyncStatus('ok'); }, function(){ setSyncStatus('error'); });
+}
+
+// ====== FULL CUSTOMER DATA (714 entries) ======
+const CRAW = [[10708,"Kavaklidere Europe GmbH","Aachen","52070",""],[10271,"Kennedy Getränke Shop","Aachen","52062",""],[10568,"Rose am Dom","Aachen","52062",""],[10415,"Nihat Bozhuyuk","Aachen","52062",""],[10671,"Handelsagentur Prümper","Aachen","52066",""],[10021,"Deniz Kebap Haus","Aachen","52062",""],[10423,"Taschbach","Aachen","52068",""],[10524,"Male\u00b4ma","Aachen","52062",""],[10252,"Aran GmbH","Aachen","52062",""],[10665,"Amis Kiosk","Aachen","52064",""],[10664,"Aix Mediterran Meat & Veggie","Aachen","52062",""],[10609,"Auf Der Hörn","Aachen","52074",""],[10273,"Cafe und Bistro Anvers","Aachen","52062","+49 (0) 241 402381"],[10522,"Veli Yildirim","Aachen","52066",""],[10386,"Rest. Georgeos Mehmet Yenen","Aachen","52064",""],[10610,"Frankenberger Hof","Aachen","52066",""],[10215,"Güner Feinkost","Aachen","52064",""],[10513,"Turquoise Restaurant","Aachen","52068",""],[10331,"Konak Gastronomie GmbH","Aachen","52062",""],[10776,"Rahim Ay","Aachen","52066",""],[10644,"Orient Expresso","Aachen","52062",""],[10343,"Kennedy Grill","Aachen","52068",""],[10703,"Akyürek","Aachen","52066",""],[10344,"Günal","Aachen","52066",""],[10216,"Hof 12","Aachen","52062",""],[10158,"Steinofen","Ahlen","59227",""],[10297,"Lehmofen","Ahlen","59227",""],[10142,"Yüksel","Ahlen","59227",""],[10501,"Mutlu","Ahlen","59229",""],[10755,"Közüm Restaurant","Ahlen","59227",""],[10311,"Karakabak","Ahlen","59229",""],[10525,"Adler Vision GmbH","Aschaffenburg","63739",""],[10209,"Kartal","Aschaffenburg","63741",""],[10189,"Limon Grillhaus","Aschaffenburg","63739",""],[10124,"Benis Weine","Bad Endorf","83093","08053-5308268"],[10076,"Il Mondo","Bad Endorf","83093","08053-5308268"],[10250,"Trade&Services Pikstein Studios","Bad Salzuflen","32105",""],[10638,"Uzuns Restaurant In Bad Soden","Bad Soden","65812","0049 6196 642 636"],[10547,"MEGA Services Retail GmbH","Bad Vilbel","61118",""],[10326,"Hotel Bareiss.","Baiersbronn","72270",""],[10283,"B.T Kleintransport GmbH","Bergisch Gladbach","51467",""],[10170,"City Cafe 29","Bergisch Gladbach","51465",""],[10769,"FeWos - NRW Metin Cosgun","Bergisch Gladbach","51469",""],[10397,"Restaurant Bosporus","Bergisch Gladbach","51465",""],[10579,"Ankara Bergisch Gladbach GmbH","Bergisch Gladbach","51465","0220229 39 333"],[10286,"Pinar Rissmann","Bergisch Gladbach","51469",""],[10456,"Erenler Gastronomie GmbH","Bergisch Gladbach","51465",""],[10318,"Beyoglu Restaurant","Bergisch Gladbach","51465",""],[10631,"Osmans Töchter","Berlin","10437",""],[10497,"Asgida Food","Berlin","12055",""],[10630,"Yeni Adana Grillhaus","Berlin","10997",""],[10702,"The MEAT","Berlin","10711",""],[10629,"Asebo UG","Berlin","13507",""],[10099,"Koc Gida GmbH","Berlin","12055","030-97002337"],[10682,"Atlantik Fischrestaurant","Berlin","10783","030 200 514 94"],[10649,"Moda GmbH","Berlin","12045",""],[10652,"Pera","Berlin","10711",""],[10080,"Sinan","Berlin","14195",""],[10689,"Bulut","Berlin","12163",""],[10707,"Fifty Fifty Gastronomie GmbH","Berlin","10629",""],[10169,"Gastrokult GmbH","Berlin","10789","030-43662023"],[10700,"Yeni Adana Grillhaus","Berlin","10997",""],[10673,"Karakaya","Berlin","10785",""],[10482,"Musterek GmbH","Berlin","10179",""],[10480,"o.T. Bar&Projektraum","Berlin","12045",""],[10478,"Baba Angora","Berlin","10629",""],[10327,"BABA PIRZOLA","Berlin","10789",""],[10351,"FOODKULT GmbH","Berlin","10789",""],[10742,"Akpolat Gastro GmbH","Berlin","10707",""],[10454,"Adana Grillhaus","Berlin","10707",""],[10018,"Adana Grillhaus","Berlin","10997","030.6127790"],[10278,"Adana Gastro GmbH","Berlin","10997","030-6127790"],[10159,"Tan Gastro GmbH","Bielefeld","33729",""],[10740,"Meydan Gastro GmbH","Bielefeld","33602",""],[10121,"Akkaya","Bielefeld","33613",""],[10696,"EFORA","Bielefeld","33605",""],[10739,"By Yol Restaurant Café Bar","Bielefeld","33602",""],[10120,"Naane GmbH","Bielefeld","33602",""],[10450,"Can Ocakbasi GmbH Restaurant","Bielefeld","33613",""],[10002,"Restaurant Kuyu UG S. Teker","Bielefeld","33602","+49 521 3997180"],[10724,"Hüseyin Tasdelen","Bochum","44805",""],[10424,"Alevitische Kultur-und Cemb. e.V","Bochum","44793",""],[10175,"Canbay","Bochum","44892",""],[10570,"Ethem Yilmaz","Bochum","44787",""],[10539,"De Fermo GmbH","Bochum","44787",""],[10226,"Sofra Türkisches Restaurant","Bochum","44787",""],[10213,"Mina GmbH Restaurant Side","Bochum","44879",""],[10433,"Öz Antep Kebap Haus","Bochum","44787",""],[10193,"Rest.Zur Buhne Bonn GmbH","Bonn","53111","0228-60889443"],[10155,"Sevinc","Bonn","53129",""],[10612,"Agirdogan","Boppard","56154",""],[10670,"Mosaik Restraurant","Borken","46325",""],[10333,"Ahi Events Bottrop GmbH","Bottrop","46240",""],[10515,"Karademir","Bottrop","46236",""],[10685,"Restaurant Tandure","Braunschweig","38122","+49 531 894558"],[10285,"Knab Restaurant","Braunschweig","38102",""],[10263,"Aslan Import GmbH","Braunschweig","38118",""],[10290,"Grill Ecke","Breisach","79206",""],[10238,"Grand Casino Spiel Center H&G GmbH","Breisach am Rhein","79206",""],[10546,"Trendy Import GmbH","Bremen","28209",""],[10014,"Gusto Grosshandel GmbH","Bremen","28217","0421.83945550"],[10231,"Akdeniz Holz Grill","Brilon","59929",""],[10256,"Zula Bar Restaurant","Bruchköbel","63486",""],[10393,"Aegaeis Restaurant","Bruchköbel","63486",""],[10341,"THE BRIDGGE HOTEL GMBH & CO. KG","Brüggen","41379",""],[10291,"The Bridgge Hotel","Brüggen","41379",""],[10600,"Orontes","Butzbach","35510",""],[10758,"Khewe Markt","Butzbach","35510",""],[10419,"Restaurant & Bar Pastillo","Butzbach","35510",""],[10537,"Yaman","Castrop-Rauxel","44581",""],[10316,"Topcu","Castrop-Rauxel","44575",""],[10747,"Radtop Hauptverwaltung","Castrop-Rauxel","44575",""],[10103,"Kaygusuz","Darmstadt","64287",""],[10750,"Erdem","Datteln","45711",""],[10523,"ESD Sachverständigen Büro","Datteln","45711",""],[10122,"GP Tasko KG","Delmenhorst","27749","04221-56061"],[10206,"Mara Restaurant","Diessen","86911",""],[10292,"Anka Restaurant","Dormagen","41540",""],[10282,"Restaurant Bosporus","Dortmund","44139","0231-125613"],[10585,"Restaurant Divan","Dortmund","44227",""],[10312,"Akbal Handels GmbH","Dortmund","44135",""],[10398,"Mustafaoglu, Gulsoy, Cosgun GbR","Dortmund","44137",""],[10460,"Samis Theaterbar","Dortmund","44137",""],[10270,"Dembra food&more GmbH","Dortmund","44147",""],[10601,"Wickeder Getränkemarkt","Dortmund","44319",""],[10384,"Anka Restaurant/Cafe","Dortmund","44145",""],[10663,"Restaurant Sumack","Dortmund","44269",""],[10019,"Af-Pack Dilekci u. Konak GmbH","Dortmund","44145","0172. 1784979"],[10653,"Varto Getränke GmbH","Dortmund","44147",""],[10678,"Eski Usul Meyhane by Anka Events","Dortmund","44339",""],[10753,"Wickeder Getränke & Minimarkt","Dortmund","44319",""],[10567,"Selin Food GmbH","Dresden","01139",""],[10693,"Ocakbasi Alstadt UG","Dresden","01067",""],[10716,"Waldborn Gaststättenbetriebs GmbH","Duisburg","47239",""],[10505,"Kiosk 44","Duisburg","47051",""],[10127,"City Treff","Duisburg","47051",""],[10036,"Kalkan","Duisburg","47138",""],[10509,"Laser Isse Europe GmbH","Duisburg","47053",""],[10191,"Zeugma Restobar","Duisburg","47057",""],[10589,"Travelplanet GmbH","Duisburg","47055",""],[10035,"Gastro Sola","Duisburg","47169",""],[10584,"Ahmedov","Duisburg","47167",""],[10380,"Okan Kilinc","Duisburg","47179",""],[10732,"Construction Solutions GmbH","Duisburg","47167",""],[10037,"La Cucilare","Duisburg","47178","0203-93127133"],[10530,"Özdogan","Duisburg","47169",""],[10672,"Ergun","Duisburg","47169",""],[10534,"Akustik Fisch & Steak House","Duisburg","47057",""],[10078,"Kilinc","Duisburg","47198","0203-4061394"],[10563,"Kadir Merdoglu","Duisburg","47139",""],[10560,"Ceyhan","Duisburg","47053",""],[10683,"Kiosk Eck","Duisburg","47169",""],[10187,"Marmaris Restaurant","Duisburg","47058",""],[10126,"Global Handelsgesellschaft mbH","Duisburg","47169","0203-608 026 00"],[10370,"Akyüz","Duisburg","47269",""],[10348,"Marina Fish House","Duisburg","47057",""],[10481,"Atucuranoglu","Duisburg","47279",""],[10712,"Zora","Duisburg","47051",""],[10353,"Mydent ZMVZ GmbH","Duisburg","47169",""],[10435,"CC Event","Duisburg","47169",""],[10224,"Evci","Duisburg","47178",""],[10439,"Kiziltan","Duisburg","47249",""],[10458,"Hüseyin Turan","Duisburg","47269",""],[10265,"Yenialtun","Düren","52353",""],[10507,"Restaurant Havanna","Düren","52349",""],[10219,"Kaffee und Schokade GmbH","Düsseldorf","40211",""],[10714,"ATIAD e.V.","Düsseldorf","40470",""],[10253,"Levanten GmbH","Düsseldorf","40468",""],[10029,"Alemdaroglu","Düsseldorf","40468",""],[10046,"Auto-Kur","Düsseldorf","40235","0211-7335555"],[10690,"Fortuna Cafe","Düsseldorf","40235",""],[10736,"Bostanci & Partner GmbH","Düsseldorf","40213",""],[10472,"ArabesQ GmbH","Düsseldorf","40629",""],[10222,"DSV 04 Clubhaus Restaurant","Düsseldorf","40231",""],[10457,"David La Guern","Düsseldorf","40547",""],[10469,"Abas Demirkürek","Düsseldorf","40227",""],[10071,"Onay","Düsseldorf","40237",""],[10276,"La Castagnas GmbH","Düsseldorf","40476","0211-466211"],[10024,"Duzcu","Düsseldorf","40468",""],[10403,"Lezzet Restaurant","Düsseldorf","40476",""],[10684,"Anadolu e.V.","Düsseldorf","40237",""],[10227,"Shaffi","Düsseldorf","40549",""],[10284,"Sabo Restaurant","Düsseldorf","40239","0211-23949776"],[10178,"Marketim Gourmet","Düsseldorf","40477",""],[10182,"CC COOL FOOD GmbH","Düsseldorf","40231",""],[10240,"Ünlüpinar","Düsseldorf","40547",""],[10692,"Cetinkaya","Düsseldorf","40625",""],[10197,"E & E Events C/o Erkan Ersoy","Düsseldorf","40476",""],[10066,"Kiji mediator","Düsseldorf","40221",""],[10043,"Optimal GmbH","Düsseldorf","40239","0211-350 754"],[10205,"Kandemir","Düsseldorf","40545",""],[10260,"Sadiki Azem","Düsseldorf","40227",""],[10044,"Finest Dinner Gastronomie GmbH","Düsseldorf","40474","0211-30294220"],[10492,"Fortuna Cafe","Düsseldorf","40235",""],[10508,"Meya GmbH","Düsseldorf","40213",""],[10077,"Hairstyle by Ramo","Düsseldorf","40233","0211-41 60 99 00"],[10184,"Anfora GmbH","Düsseldorf","40215",""],[10438,"ARTA GmbH","Düsseldorf","40212",""],[10440,"Wertepool GmbH","Düsseldorf","40213",""],[10421,"Türkisch European Business Association e.V","Düsseldorf","40212",""],[10188,"Taverna Toxotis","Düsseldorf","40474",""],[10070,"Best Cut","Düsseldorf","40210","0211-171 13 72"],[10486,"Migrantinnenverein Düsseldorf e.V.","Düsseldorf","40625",""],[10214,"The Kitchen GmbH","Düsseldorf","40477",""],[10639,"Hexe Bolker4","Düsseldorf","40213",""],[10694,"Danacioglu","Düsseldorf","40468","01732892200"],[10203,"Deniz Market","Düsseldorf","40476",""],[10511,"Balkan","Düsseldorf","40476",""],[10168,"Tokat","Düsseldorf","40625",""],[10640,"Bier zur Liebe","Düsseldorf","40223",""],[10551,"Digital Network Solution GmbH","Düsseldorf","40212",""],[10592,"Julia & Dieter Ahrweiler GbR","Düsseldorf","40213","+49 211 863 9999 0"],[10594,"Grill Pizzeria Cemo","Düsseldorf","40217",""],[10596,"Cagri Özay","Düsseldorf","40549",""],[10743,"Guckiran","Düsseldorf","40472",""],[10095,"Coskun","Düsseldorf","40235",""],[10315,"Restaurant Maurizio","Düsseldorf","40476",""],[10607,"Ali Erdogan","Düsseldorf","40212",""],[10608,"Ismail Erdogan","Düsseldorf","40489",""],[10352,"Erdogan","Düsseldorf","40221",""],[10650,"Sara Bengi Günal","Düsseldorf","40468",""],[10116,"Y-Getränke","Düsseldorf","40235","0211-97719188"],[10347,"GD Studio GmbH","Düsseldorf","40227",""],[10770,"Trinkhalle by Fero","Düsseldorf","40591",""],[10619,"Kuru","Düsseldorf","40474",""],[10620,"Restaurant Schwarzes Meer","Düsseldorf","40210","0211-1708418"],[10621,"Genussmarkt GmbH","Düsseldorf","40477",""],[10775,"Safak","Düsseldorf","40489",""],[10328,"Aydan Drin","Düsseldorf","40547",""],[10627,"Bäckerei Kiosk Nussecke","Düsseldorf","40476","0049 163 268 73 05"],[10107,"Bach Gastro Ug","Düsseldorf","40213","0211-96666536"],[10778,"Krishan","Düsseldorf","40477",""],[10336,"Sanön","Düsseldorf","40470",""],[10106,"Barola","Düsseldorf","40489",""],[10633,"Sara BENGI Günal","Düsseldorf","40468",""],[10104,"Provinzial","Düsseldorf","40233",""],[10641,"Fahrschule Zick Zack","Düsseldorf","40476",""],[10335,"Novamak GmbH","Düsseldorf","40239",""],[10371,"Perla Porto GmbH","Düsseldorf","40221",""],[10373,"Türkisches Generalkonsulat Düsseldorf","Düsseldorf","40549",""],[10363,"Uyar","Düsseldorf","40549",""],[10553,"Grandhotel Bad Pyrmont GmbH","Düsseldorf","40213",""],[10157,"Atabek","Düsseldorf","40239",""],[10374,"Salih Bostanci","Düsseldorf","40217",""],[10751,"Feinkost Cayan","Düsseldorf","40545",""],[10761,"Dogan","Düsseldorf","40233",""],[10006,"Sara Handel UG","Düsseldorf","40489",""],[10576,"The Classic Western Steakhouse","Düsseldorf","40477",""],[10555,"Cafe La Luna","Düsseldorf","40213",""],[10151,"Restaurant Antalya","Düsseldorf","40210","0211-363320"],[10017,"KochDichTürkisch","Düsseldorf","40235","0211.98906850"],[10382,"The Mahzen Bar","Düsseldorf","40213",""],[10676,"Oztelcan","Düsseldorf","40589",""],[10399,"Saitta Import GmbH","Düsseldorf","40545",""],[10463,"Deutsches Beratungs und Digitalisierungsbüro","Düsseldorf","40212",""],[10377,"TIGGES Rechtsanwälte Partnerschaft","Düsseldorf","40221",""],[10582,"Demir","Düsseldorf","40489",""],[10400,"Multi Kult Store GmbH","Düsseldorf","40213",""],[10301,"Rheinton","Düsseldorf","40479",""],[10082,"Optimal Eng. & Trade GmbH","Düsseldorf","40239",""],[10145,"Conosco Gastro GmbH","Düsseldorf","40212",""],[10300,"Club Zirve","Düsseldorf","40468",""],[10635,"Kuyucu","Elmenhorst/Lichtenhagen","18107",""],[10051,"Grand Casino Spielcenter H&G","Endingen Am Kaiserstuhl","79346",""],[10100,"Tuncay","Endingen Am Kaiserstuhl","79346",""],[10543,"Ak","Ennepetal","58256",""],[10304,"Alkan","Ennepetal","58255",""],[10360,"Güven","Ennepetal","58256",""],[10174,"Ba Badiyel","Erfurt","99084","0361 23002005"],[10310,"Alamehmet","Erkelenz","41812",""],[10228,"Bilen Bau GmbH","Erkelenz","41812","02431-9745026"],[10003,"Imza","Essen","45326",""],[10313,"Alkan","Essen","45327",""],[10359,"Afra Gastroservice GmbH","Essen","45326",""],[10005,"OMNIA MEAT GmbH","Essen","45141",""],[10033,"Mengen","Essen","45141",""],[10248,"Bigchefs Centro GmbH","Essen","45143",""],[10413,"WeinCafe Cuvee","Essen","45219",""],[10744,"Drulls Gastronomie GmbH","Essen","45127",""],[10009,"Akbulut","Essen","45327",""],[10752,"Rayace Handel","Essen","45329",""],[10045,"Cakar","Essen","45143",""],[10387,"Katakomben Theater GmbH","Essen","45131",""],[10241,"Goldene Schritte e.V.","Essen","45307",""],[10412,"Prenses Dügün Salonu","Essen","45143",""],[10483,"Cafe Restaurant Imza","Essen","45326",""],[10161,"Ahmet Akin","Essen","45327",""],[10069,"Global Handelsgesellschaft mbH","Essen","45128","0201-36557305"],[10697,"Garba","Essen","45141",""],[10065,"Restaurant Tablo GmbH","Essen","45128","0201. 8119585"],[10136,"Ataman","Essen","45143",""],[10489,"Arnas Deutschland GmbH","Essen","45276",""],[10709,"Linaa Cafe","Essen","45355",""],[10611,"Kanik","Essen","45143",""],[10147,"Yd Weinhandel","Essen","45149",""],[10081,"Ercan","Essen","45359",""],[10152,"Loran Gastronomie und Management GmbH","Essen","45127","02012944644"],[10574,"Lujo Restaurant & Seecafé am Baldeneysee","Essen","45239",""],[10180,"Kiosk Oktay Oruc","Essen","45143",""],[10622,"Alberti","Essen","45133",""],[10554,"Arslan","Essen","45326",""],[10624,"Elis Cafe","Essen","45239",""],[10223,"Manolya Turkish Delight","Essen","45147",""],[10156,"Türkisches Generalkonsulat","Essen","45307",""],[10112,"Restaurant Bosporus","Essen","45134","0201-33099158"],[10153,"Akbulut","Essen","45327",""],[10452,"Arkadasch Restaurant & Lounge","Esslingen","73728",""],[10306,"Reyjan GmbH","Eupen","4700",""],[10731,"Die KÄS gGmbH","Frankfurt am Main","60316",""],[10072,"SA Lebensmittel GmbH","Frankfurt am Main","65929","069-33093670"],[10741,"Mehmet Sönmez - Mare Azzurro","Frankfurt am Main","60487",""],[10583,"ASM GbR","Frankfurt am Main","60316",""],[10733,"ASM GbR","Frankfurt am Main","60316",""],[10173,"My Lokanta","Frankfurt am Main","60435","069-207 38 449"],[10378,"Limon","Frankfurt am Main","60431","069 711 69 593"],[10068,"Saki Restaurant","Frankfurt am Main","60594",""],[10086,"Duble Meze Grill","Frankfurt am Main","60389",""],[10581,"Die Käs GmbH","Frankfurt am Main","60316","069 550736"],[10162,"Natural Floor Inh. Suzan Altun","Frankfurt am Main","60311",""],[10346,"Local Dealer","Frankfurt am Main","60594",""],[10637,"Meeresrausch Fischrestaurant","Frankfurt am Main","60385",""],[10471,"US Gastro GmbH","Frankfurt am Main","60316",""],[10774,"Manti Time Services GmbH & Co Kg","Frankfurt am Main","60313",""],[10704,"Cafe Sülo","Frankfurt am Main","60528",""],[10063,"Yakamoz GmbH-Anatolia Cafe Restaurant","Frankfurt am Main","60313","069-29729546"],[10773,"Minka","Frankfurt am Main","60313",""],[10660,"Jiyan Handels GmbH","Frankfurt am Main","60316",""],[10655,"Kantine Kiyi","Frankfurt am Main","60431",""],[10502,"Le Phenix","Frankfurt am Main","60431",""],[10616,"Feinkost Paradies","Frankfurt am Main","60329","069 234 316"],[10618,"Asterias Restaurant","Freiburg","79108",""],[10194,"Divan Restaurant","Freiburg","79098",""],[10461,"Mr. Fero","Freiburg","79098",""],[10325,"Toms Restaurant","Freiburg","79098",""],[10591,"Harem Restaurant","Freiburg","79098","0761 22533"],[10409,"Hayri Erdem","Friedrichsdorf","61381",""],[10654,"Tandurem Restaurant","Fulda","36037",""],[10765,"Mediterran Delikate","Fulda","36037",""],[10737,"By Gürme Bar Restaurant","Garbsen","30826",""],[10320,"Savarona UG","Gelsenkirchen","45879",""],[10094,"Aslan","Gelsenkirchen","45888",""],[10571,"Cengiz","Gelsenkirchen","45888",""],[10129,"Kara","Gelsenkirchen","45899",""],[10131,"Sultan of The Meat","Gelsenkirchen","45894",""],[10330,"Nasip Cafe","Gelsenkirchen","45892",""],[10016,"Fahri Usta Ocakbasi","Gelsenkirchen","45899","0209.3613442"],[10338,"Global Handelsgesellschaft mbH","Gelsenkirchen","45879",""],[10160,"Trinkhalle Keles","Gelsenkirchen","45899",""],[10462,"Macera Lounge","Gelsenkirchen","45879",""],[10711,"Kaz GmbH","Gelsenkirchen","45884",""],[10691,"WeinDuo","Gevelsberg","58285",""],[10053,"Hotel Linda","Gladbeck","45964","02043.4020564"],[10518,"A+A Glashütten Restaurant und Hotel GmbH","Glashütten","61479",""],[10763,"Mola Grafschaft","Grafschaft","53501",""],[10362,"Gül","Grevenbroich","41516",""],[10201,"Hümintech GmbH","Grevenbroich","41517",""],[10447,"Akbas","Grevenbroich","41515",""],[10299,"Sahin","Grevenbroich","41516",""],[10484,"Duran Getränke GmbH","Grevenbroich","41515",""],[10055,"Nergiz Großmarkt GmbH","Gronau","48599","02562 7040"],[10057,"Jacob Food and Drinks","Gronau","48599","02562 8177086"],[10533,"REWE","Groß-Bieberau","64401",""],[10038,"Eagle Gruppe GmbH","Großwallstadt","63868",""],[10164,"Gulsular","Hagen","58135",""],[10453,"Pamukkale Koz Restaurant","Hamburg","20357",""],[10449,"Stock Spirits GmbH & Co. KG","Hamburg","22765",""],[10598,"Altes Fährhaus GmbH","Hamm","59073","02381 491 06 26"],[10212,"Olive Restaurant Kartal GbR","Hamm","59065",""],[10444,"Restaurant Holzofen","Hamm","59071",""],[10358,"Blind Rabbit Coctailbar","Hanau","63450",""],[10211,"Göker","Hanau","63454",""],[10552,"Schäfer","Hanau","63450",""],[10135,"Cafe Zum Deutsche Hof","Hanau","63452",""],[10651,"Morgenland Import Export Gastr. GmbH","Hannover","30453",""],[10417,"Weber Transport GmbH","Hannover","30449",""],[10254,"Urfa Class","Hannover","30161",""],[10687,"Sultan Palace GmbH","Hannover","30419",""],[10079,"Kumkapi Restaurant","Hannover","30159","0511-12359591"],[10255,"Zazana Kneipe","Hannover","30167",""],[10686,"Rest. Kreuzklappe","Hannover","30159",""],[10357,"Alte Gundtei","Heidelberg","69117",""],[10096,"Celik","Herne","44649",""],[10239,"Goer","Herne","44653",""],[10332,"Dogukan Caliskan","Herne","44649",""],[10365,"Ugur","Herne","44653",""],[10004,"Bizbize Deluxe","Herne","44652","+49 17661383374"],[10643,"El Greco Grillhaus","Herzogenrath","52134",""],[10364,"Rodi Grillhaus","Herzogenrath","52134",""],[10521,"Roni Grillhaus","Herzogenrath","52134",""],[10246,"REWE Sedat Tekin oHG","Heusenstamm","63150",""],[10245,"REWE Sedat Tekin oHG","Heusenstamm","63150",""],[10389,"Gastronomie und Service GmbH","Hilden","40721",""],[10470,"BSB Gourmet & Handel","Hilden","40721",""],[10367,"Keklik","Hilden","40721",""],[10558,"Istanbul Restaurant Ocakbasi","Hilden","40721",""],[10232,"Burg Hotel","Homberg","34576",""],[10528,"Rewe","Höchst","64739",""],[10059,"Celik","Höhr-Grenzhausen","56203",""],[10058,"Bizim Mangal","Höhr-Grenzhausen","56203","02624. 9525000"],[10148,"Türkisches Generalkonsukat Köln","Hürth","50354",""],[10599,"De Liva","Ibbenbüren","49477",""],[10767,"Agora 1596","Jena","07743",""],[10281,"Gürer","Kaarst","41564",""],[10264,"Atilgan","Kaarst","41564",""],[10001,"Gürer","Kaarst","41564","01712240851"],[10745,"Fenix Fasion GmbH","Kaarst","41564",""],[10428,"Yildiz","Kamp-Lintfort","47475",""],[10566,"Chaivallier GmbH","Karben","61184",""],[10723,"Araz Groß- & Einzelhandel","Kaufungen","34260",""],[10052,"Firat Groß.-U. Einzelhandel","Kaufungen","34260","05605 9419525"],[10766,"Ibos Gross und Einzenhandel","Kaufungen","34260",""],[10490,"Florida lounge","Kehl","77694",""],[10050,"Orak","Kehl","77694",""],[10531,"Divan Rest.","Kehl","77694",""],[10090,"Adana Ocakbasi Grillhaus GmbH","Kehl","77694","07851-9576660"],[10532,"Karakus","Kehl","77694",""],[10516,"Can-Su Dugun Salonu","Kelkheim","65779",""],[10464,"Sommer","Kempen","47906",""],[10427,"Mustafa Armagan Apak","Kempen","47906",""],[10294,"Ela Restaurant Seyhan Alkan","Kempen","47906",""],[10603,"Cabirs Restaurant","Kirchhain","35274",""],[10593,"ITALY Gastro GmbH","Koblenz","56068",""],[10244,"Görres Gastro GmbH","Koblenz","56068",""],[10322,"Restaurant Beyzade","Konstanz","78462",""],[10041,"Karaman Lasaridou GbR","Korb","71404",""],[10666,"Kula","Korbach","34497",""],[10381,"Rechtsanwälte Sariyar & Kollegen","Korschenbroich","41352",""],[10274,"Anatolia Döner","Krefeld","47799",""],[10586,"Cafe Passage","Krefeld","47829",""],[10467,"Kocaman","Krefeld","47809",""],[10143,"Physiotherapie Cakmak","Krefeld","47805","0211 949 2636"],[10405,"Demirtas","Krefeld","47804",""],[10146,"Özbay","Krefeld","47799",""],[10266,"Kara","Krefeld","47807",""],[10408,"SEC Werbung","Krefeld","47798",""],[10420,"Karadag","Krefeld","47807",""],[10735,"EA Management Holding GmbH","Krefeld","47798",""],[10183,"Yasar","Krefeld","47798",""],[10073,"Sahin und Sahin Gbr","Krefeld","47798",""],[10432,"Hamza Sahin","Krefeld","47798",""],[10034,"Bey GmbH","Krefeld","47799","0201-270059"],[10541,"Deutsch-Türkische Gesellschaft Krefeld e.V","Krefeld","47799",""],[10729,"Varsoamis Georgeos","Krefeld","47798",""],[10442,"Safak","Krefeld","47799",""],[10698,"Yayla GmbH","Krefeld","47800",""],[10163,"Alkan","Krefeld","47809",""],[10466,"Ritali Werbung GmbH","Krefeld","47799",""],[10416,"Tartar","Krefeld","47805",""],[10401,"Demircapa","Krefeld","47807",""],[10166,"Restaurant Arabul G. Yarali","Krefeld","47798","02151 64 715 55"],[10125,"Südwall Kiosk","Krefeld","47798",""],[10207,"Muarrem Aydin","Krefeld","47809",""],[10342,"Sari","Krefeld","47809",""],[10345,"Celebi","Krefeld","47799",""],[10669,"Deniz Caliskan","Krefeld","47809",""],[10132,"Tümay Günes Tartar","Krefeld","47805",""],[10056,"Sahin","Krefeld","47800",""],[10317,"Alevitisches Kulturzentrum Krefeld und Umgebung eV","Krefeld","47798",""],[10354,"Südwall Kiosk","Krefeld","47798",""],[10319,"Magma GbmH","Krefeld","47798",""],[10613,"S-Dogan GmbH & Co. KG","Köln","50678",""],[10777,"Reef & Beef","Köln","50968",""],[10204,"Elit Food Concept GmbH","Köln","50827",""],[10565,"Zadem Prive","Köln","50672",""],[10577,"G-Dogan GmbH","Köln","50678",""],[10514,"ILICA GmbH","Köln","50667","0177 889 91 20"],[10321,"Batuhan Kolkilic","Köln","50672",""],[10445,"Dapfne Event & Catering GmbH","Köln","51105",""],[10446,"Germania Terrasse Restaurant","Köln","51105",""],[10499,"Ziyadem Naturladen","Köln","51063","0221-29103536"],[10235,"IBF GmbH","Köln","50735",""],[10340,"Akpinar GmbH","Köln","51143",""],[10339,"OXORY AS.DS GmbH","Köln","50968",""],[10512,"Che Ma Restaurant","Köln","51063",""],[10726,"Meydan","Köln","50739",""],[10102,"Osman30","Köln","50670","0221 50052082"],[10133,"Akpinar Getränke Einzel und Grosshandel","Köln","50739","0221-530 40 67"],[10012,"Wines,Beers and Spirits GmbH","Köln","50931",""],[10139,"Yaliyomo GmbH","Köln","50678","0221 716 18 50"],[10383,"Sevim Kamer","Köln","50769",""],[10675,"Selina Abholmarkt","Köln","51105","0049 221 801 13"],[10269,"Utanc Zeren Gbr","Köln","50733",""],[10268,"Omas Küche","Köln","50667",""],[10074,"Art Istanbul","Köln","51143",""],[10137,"Global Lounge Network OP DE GmbH","Köln","50968",""],[10759,"Emili","Köln","50672",""],[10710,"Sultan Cokgezer","Köln","50667",""],[10128,"Löwenbraeu Koeln Hotel und Rest. GmbH Co.& KG","Köln","50667","0221-47443155"],[10506,"Istanbul Fisch & Steak House","Köln","50823",""],[10634,"Ünlü","Kühlungsborn","18225",""],[10368,"Hotel Ostseestern","Kühlungsborn","18225",""],[10705,"Uenlue Group","Kühlungsborn","18225",""],[10561,"Moon Events&Catering","Laatzen","30880",""],[10695,"Elti Bistro","Lahr","77933",""],[10288,"S-Dogan GmbH & Co.KG","Langenfeld","40256",""],[10287,"g-dogan GmbH","Langenfeld","40256",""],[10298,"Bonname Dortmund GmbH","Langenfeld","40256",""],[10177,"g-dogan GmbH","Langenfeld","40256",""],[10465,"Pizza Cafe- Pavillon am Stadtpark","Leichlingen","42799","02175-9796666"],[10229,"Restaurant Paradies","Leingarten","74211","07131-401896"],[10748,"Harun Vergiveren","Leverkusen","51373",""],[10459,"Ali Kara","Ludwigshafen","67071",""],[10720,"Dimo kiosk","Lüdenscheid","58507",""],[10677,"MK Getränke","Lüdenscheid","58507",""],[10249,"Soulfood and Meze","Lünen","44534",""],[10394,"Dev-Pack GmbH","Magdeburg","39110",""],[10210,"Ephesus Restaurant","Mainaschaff","63814",""],[10488,"Kiosk am Frauenlob By Sen","Mainz","55118",""],[10757,"Yikilmis","Mainz","55122",""],[10688,"Ismail Sen","Mainz-Kastel","55252",""],[10418,"Yümmis Restaurant","Mannheim","68159",""],[10500,"BLG Kardesler Lebensmittel-Handelsges. mbH","Mannheim","68199",""],[10425,"Hep Alacati","Mannheim","68169",""],[10668,"Ali Riza Kara","Mannheim","68169",""],[10434,"Viermann GmbH","Meerbusch","40670","0172 191 27 27"],[10350,"Mola","Meerbusch","40670",""],[10027,"Dogulu","Meerbusch","40667",""],[10272,"Erden Feinkost","Meerbusch","40667",""],[10022,"Koc Wein Werk GmbH","Meerbusch","40670",""],[10167,"Eroglu","Meerbusch","40667",""],[10032,"Egeria GmbH","Mettmann","40822","02104-8002102"],[10105,"Provinzial","Mettmann","40822","02104-28 14 800"],[10738,"Restaurant Efes","Minden","32423",""],[10349,"Cetinkaya","Moers","47441",""],[10369,"Burhan Üzgec","Moers","47441",""],[10606,"E&K Umweltservice GmbH","Monheim Am Rhein","40789",""],[10549,"E und K Unweltservice GmbH","Monheim Am Rhein","40789",""],[10719,"MahlAnderZ Möhnesee","Möhnesee","59519",""],[10632,"La Mesa","Mönchengladbach","41066",""],[10149,"Akdemir","Mönchengladbach","41063",""],[10150,"Polat Dönerproduktion GmbH","Mönchengladbach","41066","02161-821090"],[10536,"ASG Aluminium & Stahl GmbH","Mönchengladbach","41238","02166 9988390"],[10595,"Cafe Trotzdem","Mönchengladbach","41065","+49 2161 22621"],[10587,"Aylin Yerli","Mönchengladbach","41238",""],[10218,"Restaurant Zeitlos","Mönchengladbach","41065",""],[10013,"Restaurant Neuzeit","Mönchengladbach","41066","021615610111"],[10236,"Zafer Özturk","Mönchengladbach","41061",""],[10221,"Digital Art Media Nova GmbH","Mönchengladbach","41238",""],[10376,"Ristorante La Montagna","Mühlheim","63165",""],[10375,"SAM River Event GmbH","Mülheim an der Ruhr","45481",""],[10267,"Albayrak","Mülheim an der Ruhr","45478",""],[10510,"Istanbul Fisch und Steak Haus","Mülheim an der Ruhr","45468",""],[10190,"Trüffel Fine Dining","Mülheim an der Ruhr","45481",""],[10303,"Liva Restaurant UG","Mülheim an der Ruhr","45468",""],[10451,"Fisch & SteakHause Türkis","Mülheim an der Ruhr","45481",""],[10179,"Gastro YM GmbH","Mülheim an der Ruhr","45481",""],[10165,"Restaurant Ronja","Mülheim an der Ruhr","45468",""],[10220,"Ronjas Wein-Depot","Mülheim an der Ruhr","45479",""],[10713,"Dönmez","Mülheim an der Ruhr","45468",""],[10093,"Mezze Cafe & Lounge","Mülheim an der Ruhr","45476",""],[10064,"Medi Food Handels GmbH","München","81371","089.1893950"],[10754,"Ramo Adana Kebab","München","80809",""],[10722,"Mezzinis Delikatessen GmbH","München","80802",""],[10075,"S Cafe","München","80809",""],[10296,"Gürmet Wein & Meze am Markt","München","80331",""],[10295,"Pera Meze","München","80469",""],[10259,"Restaurant Pageou","München","80333",""],[10476,"Arin Market","München","81735",""],[10614,"Piya Rest. & Bar","München","80337","+49 (0) 89 76 77 64"],[10097,"Mete Gür","München","81679",""],[10305,"Boname Münster","Münster","48143",""],[10307,"Tajora GmbH","Münster","48143",""],[10569,"Restaurant Deniz","Münster","48153",""],[10414,"Always Food GmbH","Nagold","72202",""],[10718,"Duja Ballroom","Nattheim","89564",""],[10475,"Lidl Digital Trading GmbH & Co. KG","Neckarsulm","74172",""],[10430,"Lidl Digital Trading GmbH & Co. KG","Neckarsulm","74172",""],[10717,"Auger Autotechnik GmbH","Neukirchen-Vluyn","47506","+49 152 02002646"],[10028,"Willemsen GmbH","Neuss","41460",""],[10111,"HG HausGrund Invest GmbH","Neuss","41460",""],[10110,"Automobile Cosar","Neuss","41460",""],[10026,"Besa GmbH","Neuss","41468","02131-5313400"],[10662,"Binbir gece","Neuss","41460",""],[10762,"Grillpalast Neuss GmbH&Co KG.","Neuss","41460",""],[10760,"Tip Top Car Service GmbH","Neuss","41468","02131-52 558 68"],[10355,"Baslar Flight Center","Neuss","41460",""],[10289,"Duran GmbH","Neuss","41466",""],[10025,"tan internationale spedition & logistik GmbH","Neuss","41468","02131-29569170"],[10195,"Maxi UG","Neuss","41460",""],[10251,"Aladins Wunderlampe GmbH","Neuss","41460",""],[10503,"FC Beste Handels GmbH","Neuss","41466",""],[10202,"ABKM Neuss Cem Evi","Neuss","41462",""],[10495,"Ahmet Simsek","Neuss","41466",""],[10494,"Kapadokya Handelsgesellschaft mbH","Neuss","41460",""],[10185,"Yilba GmbH","Neuss","41468",""],[10172,"Deniz","Neuss","41469",""],[10559,"01 adana Sema Karasac","Neuss","41460",""],[10431,"Vicus Italiano","Neuss","41460",""],[10572,"RheinRealNeuss GmbH","Neuss","41468",""],[10681,"Malama Restaurant","Neuwied","56564",""],[10243,"Anatolia Neuwied","Neuwied","56564","0176 245 32 007"],[10545,"Fischrestaurant Medo Mondorf","Niederkassel","53859",""],[10646,"Tcahiki Dobrowski","Niederkassel","53859",""],[10647,"Markthaus Rhein Grill & Pizzeria","Niederkassel","53859",""],[10468,"Unal","Niederkassel","53859",""],[10648,"Murat Coskun","Niederkassel","53859",""],[10602,"Golfschmiede gastronomische GmbH","Niedernberg","63843",""],[10208,"Restaurant 9. 1/2","Niedernberg","63843",""],[10015,"Üstel Gbr","Nürnberg","90441","0911.6200189"],[10334,"GVS Group GmbH","Nürnberg","90431",""],[10196,"Goldener Hügel Cosgun GmbH","Nürnberg","90431",""],[10477,"ASK Gastrovertrieb GmbH","Nürnberg","90441",""],[10225,"Anemon","Ober-Ramstadt","64372",""],[10436,"OGL Food Trade Lebensmittelvertrieb GmbH","Oberding","85445",""],[10023,"Paradies Gastronomie & Getränke GmbH","Oberhausen","46049",""],[10548,"DEREWA GmbH","Oberhausen","46149",""],[10721,"Beathouse Company GmbH","Obing","83119","08624 2206"],[10487,"Restaurantta Fantasia","Offenbach","63065",""],[10768,"Erdikmen","Offenbach","63067",""],[10493,"Pizzeria Fantasia 3 GmbH","Offenbach","63073",""],[10020,"Daglik GmbH","Offenbach","63065","069. 26095573"],[10699,"Avrupadan","Offenbach","63067",""],[10134,"Uyanik","Offenbach","63065",""],[10324,"Sky Lounge","Offenburg","77652",""],[10391,"Gasts. Efem Songül Keskin","Offenburg","77652",""],[10062,"Menekse","Offenburg","77652",""],[10088,"Gaststätte Efem Songuel Keskin","Offenburg","77652","0781-9674615"],[10390,"le Quartier Feinkost","Offenburg","77654",""],[10329,"Restaurant Olive","Osnabrück","49074",""],[10091,"Akyüz","Ottobrunn/ München","85521",""],[10118,"Hanedan Restaurant Cafe","Parchim","19370",""],[10048,"Ahi Event Locations GmbH & Co.KG","Ratingen","40878","02102-447414"],[10779,"Tibet Hotel","Ratingen","40880",""],[10573,"Uno Espresso GmbH","Ratingen","40878",""],[10535,"Haykir","Ratingen","40878",""],[10636,"Yasar","Ratingen","40880",""],[10230,"Biko Restaurant & Cafe","Ratingen","40878","02102-551 96 80"],[10141,"Karadag Süpermarket","Recklinghausen","45657",""],[10498,"Levin Event , Hochzeiten Restaurant","Recklinghausen","45661",""],[10706,"Neon Energie GmbH","Remscheid","42897","+49 2191 463 97 90"],[10130,"At Technologies GmbH","Remscheid","42897","02191-4639793"],[10262,"MineDineWine","Rheinbach","53359",""],[10667,"Ristorante IL Capitano","Rodgau","63110",""],[10527,"Hotel Wolfschlucht","Rodgau","63110",""],[10411,"Khewe Markt","Rosbach","61191",""],[10701,"Großhandel Güdük GmbH & Co. KG","Rostock","18069",""],[10302,"Azad Food GmbH","Rothenstein","07751",""],[10448,"Europe-Park GmbH & Co - Mack KG","Rust","77977",""],[10039,"Kiosk an der Marktstrasse","Rüsselsheim","65428",""],[10242,"Mir Pack GmbH","Saarbrücken","66130",""],[10361,"Jade Gastro GmbH","Saarbrücken","66111",""],[10198,"Winkels Getränke Logistik GmbH","Sachsenheim","74343",""],[10054,"Kemal","Schwelm","58332",""],[10261,"Aka","Schwelm","58332",""],[10337,"Cemil Sagu","Schwelm","58332",""],[10588,"BF.C Gülfariz Celik","Seeheim-Jugenheim","64342",""],[10625,"Gasthof zum Riesen GmbH","Seligenstadt","63500",""],[10590,"Restaurant Alte Schmiede","Seligenstadt","63500",""],[10410,"Akdag Gastr. & Hotel GmbH Co. KG","Seligenstadt","63500",""],[10060,"3 Mohren","Sindelfingen","71063","07031-6772275"],[10406,"S-Dogan GmbH & Co. KG","Solingen","42645",""],[10734,"TOPSPIN","Solingen","42657",""],[10114,"Kiosk Am Busbahnhof","Solingen","42651",""],[10309,"Fasil Restaurant Lounge Bar","Solingen","42651",""],[10113,"Kiosk Am Bahnhof","Solingen","42697",""],[10379,"G-Dogan GmbH","Solingen","42645",""],[10680,"Kaan Ayaydin","Solingen","42659",""],[10192,"S-Dogan GmbH & Co. KG","Solingen","42645",""],[10407,"G-Dogan GmbH","Solingen","42645",""],[10144,"Steuerbüro Andreas Litzke","Solingen","42653",""],[10604,"Avci","Stadtallendorf","35260",""],[10727,"Restaurant bei Cemo","Steffeln","54597",""],[10061,"Adana Sofrasi","Stuttgart","70178","0711-51876944"],[10404,"Le Chic","Stuttgart","70565",""],[10402,"Mittelmeer Feinkost","Stuttgart","70190","0711-3058129"],[10030,"Sarap Online GmbH","Stuttgart","70327","0711-40099290"],[10578,"Benz.Digital GmbH & Co KG","Stuttgart","70329","0711 99587820"],[10186,"Güven Supermarkt","Sulzbach","63834",""],[10580,"Zeki Yildirim","Trebur","65468",""],[10138,"Medipa Handels GmbH","Troisdorf","53844",""],[10562,"La Gastronomi &Getränkegrosshandel GmbH","Troisdorf","53842",""],[10366,"AS-KA GmbH & Co. KG","Tönisvorst","47918",""],[10628,"Robiin Kilinc","Tönisvorst","47918","02151 796 800"],[10715,"Samco Autotechnik GmbH","Tönisvorst","47918",""],[10308,"Özer","Velbert","42549",""],[10658,"Kolcak","Velbert","42549",""],[10234,"Koyun Food","Villingen-Schwenningen","78054",""],[10756,"GS Gastro GmbH","Völklingen","66333",""],[10441,"Yali","Waldkirch","79183",""],[10233,"Restaurant Taksim","Weil am Rhein","79576",""],[10089,"Narli Market","Weil am Rhein","79576","07621-791004"],[10199,"Alfa Pack & Food GmbH","Weil am Rhein","79576",""],[10529,"Restaurant Et.Can","Wendlingen","73240",""],[10031,"Kasaboglu","Wesseling","50389",""],[10679,"Istanbul Restaurant","Wiesbaden","65183",""],[10042,"Sen Gross-und Einzelhandel GmbH","Wiesbaden","55252",""],[10426,"Kiosk Sen 1","Wiesbaden","65197",""],[10275,"Dogan","Willich","47877",""],[10392,"Veysel Dogan","Willich","47877",""],[10293,"Objektgesellschaft","Willich","47877",""],[10154,"Desdina Palace UG","Willstätt","77731",""],[10117,"Lacktechnik Aka","Wuppertal","42389","0202-39 30 67 14"],[10356,"Troja Cafe und Restaurant","Wuppertal","42103",""],[10314,"Baro Steakhouse","Wuppertal","42103",""],[10564,"Restaurant Alaturka","Wuppertal","42103",""],[10544,"Gama GmbH","Wuppertal","42117",""],[10597,"Restaurant Esskultürk","Wuppertal","42285","0202 253 49 135"],[10372,"Herva Eventlocation Cafe","Wuppertal","42327",""],[10067,"La Piazza Cafe & Bistro","Wuppertal","42103",""],[10725,"Cem Bakirtepe","Wuppertal","42289",""],[10542,"Colak","Wuppertal","42289",""],[10575,"Restaurant Shiraz","Wuppertal","42279",""],[10092,"Caliskan","Wuppertal","42389",""],[10429,"Le Man GmbH","Wuppertal","42103",""],[10485,"Senpolat","Wuppertal","42389",""],[10217,"Novel Hotel","Wusterhausen/Dosse","16868",""],[10247,"Stiftung Bildung.Egitim","Würselen","52146",""],[10171,"Dreieck Gastro GmbH","Würselen","52146","02405-47 88 321"],[10277,"Restaurant Ararat","Würzburg","97072","0931-883088"],[10455,"Asmali Konak Deluxe GmbH","köln","51063","0221-42368555"]];
+
+const OD={10004:{s:2,c:3537,d:"26.03.26",g:46,a:75},10005:{s:7,c:89350,d:"06.05.26",g:5,a:69},10006:{s:9,c:1173,d:"26.12.25",g:136,a:39},10009:{s:2,c:833,d:"27.01.26",g:104,a:160},10012:{s:22,c:42336,d:"25.03.26",g:47,a:20},10013:{s:1,c:1752,d:"19.11.25",g:173,a:0},10014:{s:8,c:60766,d:"20.03.26",g:52,a:52},10016:{s:9,c:14697,d:"09.04.26",g:32,a:51},10017:{s:4,c:3062,d:"19.11.25",g:173,a:55},10019:{s:13,c:97032,d:"05.05.26",g:6,a:35},10020:{s:4,c:7209,d:"09.04.26",g:32,a:111},10022:{s:11,c:34948,d:"25.03.26",g:47,a:40},10023:{s:6,c:19628,d:"09.04.26",g:32,a:71},10024:{s:20,c:3523,d:"05.05.26",g:6,a:22},10025:{s:14,c:3444,d:"27.04.26",g:14,a:33},10028:{s:1,c:45,d:"19.02.25",g:446,a:0},10030:{s:1,c:1093,d:"28.11.25",g:164,a:0},10033:{s:4,c:283,d:"27.01.26",g:104,a:72},10034:{s:2,c:993,d:"23.01.26",g:108,a:18},10036:{s:12,c:5793,d:"05.05.26",g:6,a:39},10042:{s:3,c:9234,d:"20.02.26",g:80,a:49},10044:{s:20,c:18081,d:"08.05.26",g:3,a:23},10045:{s:8,c:1152,d:"30.01.26",g:101,a:37},10046:{s:7,c:1591,d:"23.12.25",g:139,a:50},10052:{s:3,c:4717,d:"20.11.25",g:172,a:54},10055:{s:2,c:14445,d:"16.04.26",g:25,a:140},10057:{s:10,c:10479,d:"20.02.26",g:80,a:40},10062:{s:2,c:1564,d:"19.08.25",g:265,a:109},10064:{s:6,c:65139,d:"10.03.26",g:62,a:68},10065:{s:1,c:1578,d:"15.05.25",g:361,a:0},10066:{s:2,c:2865,d:"10.07.25",g:305,a:70},10068:{s:8,c:3248,d:"09.04.26",g:32,a:56},10069:{s:2,c:16322,d:"29.12.25",g:133,a:91},10071:{s:2,c:284,d:"03.10.25",g:220,a:120},10072:{s:9,c:18448,d:"16.04.26",g:25,a:50},10075:{s:2,c:21302,d:"02.09.25",g:251,a:56},10078:{s:3,c:904,d:"03.10.25",g:220,a:48},10079:{s:3,c:6215,d:"16.12.25",g:146,a:103},10082:{s:1,c:453,d:"04.03.25",g:433,a:0},10088:{s:4,c:7429,d:"16.04.26",g:25,a:72},10089:{s:6,c:26235,d:"16.04.26",g:25,a:72},10094:{s:2,c:1121,d:"22.07.25",g:293,a:55},10095:{s:4,c:215,d:"27.03.26",g:45,a:67},10096:{s:5,c:1999,d:"11.03.26",g:61,a:79},10100:{s:2,c:3124,d:"09.12.25",g:153,a:148},10102:{s:6,c:2551,d:"11.11.25",g:181,a:50},10103:{s:6,c:2948,d:"20.11.25",g:172,a:51},10105:{s:2,c:1296,d:"24.06.25",g:321,a:70},10106:{s:1,c:0,d:"27.01.25",g:469,a:0},10107:{s:15,c:15851,d:"26.03.26",g:46,a:27},10111:{s:4,c:508,d:"12.12.25",g:150,a:83},10112:{s:1,c:701,d:"01.04.25",g:405,a:0},10114:{s:4,c:947,d:"21.04.26",g:20,a:80},10116:{s:2,c:355,d:"09.10.25",g:214,a:110},10118:{s:3,c:6936,d:"05.05.26",g:6,a:136},10126:{s:7,c:11726,d:"08.05.26",g:3,a:63},10128:{s:24,c:23136,d:"29.04.26",g:12,a:20},10131:{s:4,c:1898,d:"27.01.26",g:104,a:69},10133:{s:9,c:25541,d:"21.01.26",g:110,a:42},10141:{s:1,c:2166,d:"11.06.25",g:334,a:0},10142:{s:3,c:799,d:"11.03.26",g:61,a:128},10144:{s:1,c:148,d:"10.11.25",g:182,a:0},10145:{s:4,c:3064,d:"21.01.26",g:110,a:65},10146:{s:1,c:281,d:"06.10.25",g:217,a:0},10147:{s:16,c:60001,d:"08.05.26",g:3,a:30},10150:{s:3,c:2054,d:"19.01.26",g:112,a:18},10151:{s:13,c:10965,d:"30.04.26",g:11,a:37},10152:{s:2,c:1324,d:"09.10.25",g:214,a:60},10153:{s:2,c:1044,d:"15.05.25",g:361,a:48},10156:{s:1,c:874,d:"16.10.25",g:207,a:0},10157:{s:2,c:285,d:"29.09.25",g:224,a:118},10158:{s:5,c:4909,d:"21.04.26",g:20,a:85},10159:{s:2,c:7396,d:"16.12.25",g:146,a:130},10160:{s:3,c:2816,d:"23.04.26",g:18,a:145},10162:{s:11,c:10489,d:"09.04.26",g:32,a:36},10165:{s:8,c:19858,d:"26.03.26",g:46,a:48},10166:{s:14,c:7839,d:"25.03.26",g:47,a:31},10168:{s:4,c:342,d:"01.04.26",g:40,a:109},10170:{s:3,c:839,d:"05.08.25",g:279,a:44},10171:{s:2,c:605,d:"31.03.25",g:406,a:31},10173:{s:6,c:2101,d:"13.04.26",g:28,a:75},10174:{s:2,c:3739,d:"09.07.25",g:306,a:74},10175:{s:1,c:388,d:"05.11.25",g:187,a:0},10178:{s:2,c:1385,d:"25.04.25",g:381,a:39},10182:{s:2,c:5179,d:"19.05.25",g:357,a:30},10184:{s:21,c:18281,d:"08.05.26",g:3,a:22},10185:{s:1,c:143,d:"19.02.25",g:446,a:0},10188:{s:12,c:9702,d:"20.04.26",g:21,a:38},10190:{s:6,c:4701,d:"24.12.25",g:138,a:58},10192:{s:1,c:92,d:"16.02.26",g:84,a:0},10193:{s:7,c:8341,d:"10.02.26",g:90,a:51},10194:{s:3,c:2922,d:"09.12.25",g:153,a:25},10198:{s:1,c:1362,d:"21.01.25",g:475,a:0},10199:{s:4,c:13712,d:"25.09.25",g:228,a:42},10201:{s:2,c:869,d:"10.11.25",g:182,a:0},10203:{s:6,c:1885,d:"08.05.26",g:3,a:72},10205:{s:3,c:409,d:"05.05.26",g:6,a:44},10206:{s:1,c:3204,d:"28.11.25",g:164,a:0},10210:{s:6,c:1237,d:"26.02.26",g:74,a:56},10211:{s:1,c:282,d:"17.11.25",g:175,a:0},10212:{s:10,c:14306,d:"19.03.26",g:53,a:44},10213:{s:12,c:10272,d:"21.04.26",g:20,a:34},10214:{s:2,c:196,d:"24.04.26",g:17,a:18},10215:{s:4,c:1128,d:"24.04.26",g:17,a:102},10217:{s:2,c:3878,d:"02.12.25",g:160,a:70},10223:{s:1,c:889,d:"15.05.25",g:361,a:0},10226:{s:5,c:10805,d:"08.05.26",g:3,a:93},10228:{s:2,c:2334,d:"14.07.25",g:301,a:7},10229:{s:6,c:9399,d:"13.04.26",g:28,a:65},10230:{s:20,c:15093,d:"23.04.26",g:18,a:22},10231:{s:3,c:1833,d:"30.03.26",g:42,a:106},10232:{s:1,c:995,d:"15.05.25",g:361,a:0},10234:{s:4,c:10044,d:"05.02.26",g:95,a:88},10236:{s:1,c:0,d:"20.01.25",g:476,a:0},10240:{s:2,c:216,d:"25.03.26",g:47,a:76},10242:{s:6,c:38909,d:"25.02.26",g:75,a:67},10243:{s:4,c:1579,d:"16.04.26",g:25,a:89},10244:{s:4,c:5907,d:"08.05.26",g:3,a:102},10245:{s:1,c:529,d:"20.01.25",g:476,a:0},10251:{s:9,c:6568,d:"28.06.25",g:317,a:17},10252:{s:1,c:540,d:"10.03.25",g:427,a:0},10255:{s:2,c:4224,d:"16.12.25",g:146,a:42},10260:{s:3,c:2440,d:"20.04.26",g:21,a:121},10261:{s:1,c:683,d:"20.08.25",g:264,a:0},10262:{s:6,c:5330,d:"10.02.26",g:90,a:62},10263:{s:2,c:13423,d:"14.03.25",g:423,a:2},10264:{s:4,c:239,d:"24.11.25",g:168,a:55},10267:{s:1,c:248,d:"04.06.25",g:341,a:0},10270:{s:4,c:2636,d:"09.04.26",g:32,a:111},10271:{s:2,c:420,d:"07.05.26",g:4,a:86},10272:{s:6,c:2787,d:"01.04.26",g:40,a:65},10273:{s:9,c:8500,d:"07.05.26",g:4,a:47},10275:{s:1,c:253,d:"21.10.25",g:202,a:0},10277:{s:2,c:1612,d:"07.02.26",g:93,a:118},10278:{s:2,c:8820,d:"23.07.25",g:292,a:54},10284:{s:3,c:0,d:"20.04.26",g:21,a:104},10290:{s:1,c:560,d:"11.02.25",g:454,a:0},10292:{s:2,c:288,d:"17.06.25",g:328,a:0},10294:{s:5,c:4624,d:"29.01.26",g:102,a:60},10296:{s:4,c:18920,d:"31.03.26",g:41,a:98},10297:{s:12,c:8117,d:"21.04.26",g:20,a:39},10302:{s:2,c:5068,d:"11.12.25",g:151,a:78},10303:{s:1,c:539,d:"17.04.25",g:389,a:0},10309:{s:9,c:4430,d:"21.04.26",g:20,a:48},10310:{s:2,c:780,d:"17.12.25",g:145,a:0},10312:{s:5,c:18178,d:"16.01.26",g:115,a:53},10313:{s:1,c:157,d:"18.06.25",g:327,a:0},10314:{s:3,c:6329,d:"16.09.25",g:237,a:55},10317:{s:2,c:828,d:"24.11.25",g:168,a:96},10320:{s:5,c:2388,d:"27.11.25",g:165,a:64},10325:{s:1,c:2370,d:"13.01.25",g:483,a:0},10329:{s:10,c:12173,d:"19.12.25",g:143,a:33},10331:{s:9,c:2501,d:"08.04.26",g:33,a:44},10333:{s:2,c:1633,d:"20.03.25",g:417,a:18},10334:{s:17,c:46434,d:"28.04.26",g:13,a:27},10335:{s:1,c:141,d:"03.10.25",g:220,a:0},10336:{s:6,c:1151,d:"16.04.26",g:25,a:64},10340:{s:8,c:18530,d:"25.03.26",g:47,a:49},10346:{s:11,c:3939,d:"09.04.26",g:32,a:36},10347:{s:1,c:0,d:"24.06.25",g:321,a:0},10349:{s:5,c:1269,d:"16.12.25",g:146,a:56},10351:{s:12,c:108841,d:"20.04.26",g:21,a:37},10352:{s:2,c:1038,d:"30.01.26",g:101,a:180},10353:{s:1,c:282,d:"10.11.25",g:182,a:0},10354:{s:1,c:270,d:"06.03.26",g:66,a:0},10357:{s:7,c:4969,d:"16.04.26",g:25,a:55},10358:{s:1,c:823,d:"06.11.25",g:186,a:0},10359:{s:10,c:83379,d:"06.02.26",g:94,a:39},10360:{s:1,c:161,d:"06.01.25",g:490,a:0},10361:{s:2,c:1250,d:"23.12.25",g:139,a:86},10366:{s:1,c:315,d:"10.11.25",g:182,a:0},10368:{s:2,c:1514,d:"06.02.26",g:94,a:114},10373:{s:2,c:1260,d:"18.12.25",g:144,a:29},10374:{s:5,c:736,d:"30.01.26",g:101,a:24},10375:{s:5,c:2204,d:"30.01.26",g:101,a:71},10376:{s:5,c:4852,d:"26.02.26",g:74,a:80},10378:{s:4,c:1697,d:"16.03.26",g:56,a:76},10380:{s:8,c:3556,d:"18.02.26",g:82,a:48},10382:{s:2,c:606,d:"27.11.25",g:165,a:151},10386:{s:4,c:2057,d:"25.03.26",g:47,a:81},10389:{s:4,c:1333,d:"03.03.26",g:69,a:87},10392:{s:1,c:161,d:"17.02.25",g:448,a:0},10397:{s:12,c:8576,d:"24.04.26",g:17,a:34},10398:{s:9,c:5644,d:"21.04.26",g:20,a:44},10399:{s:5,c:3723,d:"19.11.25",g:173,a:61},10400:{s:3,c:438,d:"22.04.25",g:384,a:14},10401:{s:2,c:335,d:"29.07.25",g:286,a:18},10403:{s:2,c:1497,d:"14.03.25",g:423,a:0},10406:{s:1,c:0,d:"06.05.25",g:370,a:0},10410:{s:7,c:5412,d:"09.04.26",g:32,a:63},10411:{s:3,c:2465,d:"19.01.26",g:112,a:121},10413:{s:9,c:3990,d:"05.05.26",g:6,a:50},10414:{s:1,c:548,d:"14.01.25",g:482,a:0},10415:{s:1,c:1059,d:"17.10.25",g:206,a:0},10416:{s:5,c:1032,d:"05.02.26",g:95,a:69},10418:{s:5,c:2279,d:"26.02.26",g:74,a:49},10419:{s:7,c:1830,d:"09.04.26",g:32,a:63},10424:{s:1,c:864,d:"23.03.26",g:49,a:0},10425:{s:1,c:985,d:"11.02.25",g:454,a:0},10427:{s:1,c:226,d:"17.01.25",g:479,a:0},10429:{s:1,c:281,d:"16.09.25",g:237,a:0},10431:{s:2,c:1050,d:"01.04.26",g:40,a:112},10434:{s:3,c:2221,d:"08.12.25",g:154,a:81},10442:{s:1,c:124,d:"23.01.26",g:108,a:0},10444:{s:2,c:320,d:"19.03.26",g:53,a:18},10446:{s:3,c:6471,d:"07.05.26",g:4,a:66},10449:{s:6,c:13614,d:"11.03.26",g:61,a:57},10450:{s:3,c:1311,d:"11.03.26",g:61,a:51},10454:{s:1,c:6114,d:"29.09.25",g:224,a:0},10456:{s:9,c:10286,d:"01.04.26",g:40,a:47},10462:{s:8,c:15620,d:"23.10.25",g:200,a:32},10464:{s:1,c:612,d:"02.09.25",g:251,a:0},10466:{s:1,c:241,d:"06.03.25",g:431,a:0},10469:{s:2,c:456,d:"09.02.26",g:91,a:72},10477:{s:4,c:33227,d:"02.12.25",g:160,a:63},10478:{s:1,c:4505,d:"21.07.25",g:294,a:0},10482:{s:8,c:34225,d:"26.01.26",g:105,a:43},10484:{s:19,c:28467,d:"05.05.26",g:6,a:25},10487:{s:3,c:2215,d:"20.08.25",g:264,a:44},10488:{s:3,c:1047,d:"26.06.25",g:319,a:37},10490:{s:1,c:4378,d:"05.02.26",g:95,a:0},10492:{s:1,c:259,d:"15.09.25",g:238,a:0},10493:{s:3,c:1719,d:"20.08.25",g:264,a:0},10499:{s:4,c:1038,d:"08.04.26",g:33,a:91},10500:{s:5,c:70106,d:"05.02.26",g:95,a:62},10502:{s:1,c:1496,d:"09.04.25",g:397,a:0},10503:{s:3,c:1538,d:"24.12.25",g:138,a:14},10505:{s:4,c:1160,d:"16.02.26",g:84,a:59},10506:{s:6,c:1202,d:"23.01.26",g:108,a:61},10507:{s:2,c:1607,d:"08.04.26",g:33,a:21},10509:{s:1,c:1515,d:"17.10.25",g:206,a:0},10510:{s:6,c:1720,d:"23.12.25",g:139,a:57},10511:{s:4,c:1827,d:"15.08.25",g:269,a:52},10512:{s:15,c:15735,d:"24.04.26",g:17,a:30},10513:{s:2,c:1680,d:"23.06.25",g:322,a:80},10514:{s:3,c:3865,d:"27.05.25",g:349,a:41},10515:{s:3,c:5276,d:"24.12.25",g:138,a:85},10518:{s:1,c:1267,d:"01.10.25",g:222,a:0},10522:{s:1,c:468,d:"27.08.25",g:257,a:0},10524:{s:8,c:4419,d:"07.05.26",g:4,a:54},10525:{s:13,c:17853,d:"08.05.26",g:3,a:36},10527:{s:1,c:593,d:"20.02.26",g:80,a:0},10528:{s:9,c:4767,d:"08.05.26",g:3,a:53},10530:{s:2,c:3522,d:"25.11.25",g:167,a:102},10533:{s:1,c:695,d:"13.01.25",g:483,a:0},10534:{s:9,c:5465,d:"06.02.26",g:94,a:40},10536:{s:3,c:14903,d:"06.05.26",g:5,a:161},10537:{s:1,c:429,d:"09.05.25",g:367,a:0},10539:{s:17,c:15701,d:"08.05.26",g:3,a:27},10544:{s:11,c:3303,d:"26.03.26",g:46,a:34},10558:{s:3,c:1321,d:"28.06.25",g:317,a:55},10559:{s:2,c:998,d:"14.03.25",g:423,a:22},10560:{s:2,c:696,d:"07.08.25",g:277,a:90},10561:{s:1,c:2705,d:"10.02.25",g:455,a:0},10562:{s:1,c:2330,d:"19.02.25",g:446,a:0},10563:{s:3,c:837,d:"27.11.25",g:165,a:93},10564:{s:2,c:3157,d:"03.03.26",g:69,a:186},10565:{s:1,c:1124,d:"04.03.25",g:433,a:0},10566:{s:8,c:2266,d:"08.05.26",g:3,a:54},10567:{s:2,c:18896,d:"22.01.26",g:109,a:159},10568:{s:4,c:1223,d:"07.05.26",g:4,a:106},10569:{s:2,c:984,d:"09.04.26",g:32,a:196},10570:{s:2,c:305,d:"08.05.25",g:368,a:28},10571:{s:1,c:71,d:"12.03.25",g:425,a:0},10572:{s:1,c:39,d:"12.03.25",g:425,a:0},10573:{s:1,c:453,d:"14.03.25",g:423,a:0},10574:{s:1,c:639,d:"14.03.25",g:423,a:0},10575:{s:7,c:4417,d:"05.05.26",g:6,a:60},10576:{s:2,c:1868,d:"21.10.25",g:202,a:109},10577:{s:1,c:516,d:"18.03.25",g:419,a:0},10579:{s:2,c:6090,d:"22.12.25",g:140,a:136},10580:{s:1,c:803,d:"25.03.25",g:412,a:0},10581:{s:2,c:0,d:"31.03.25",g:406,a:3},10582:{s:2,c:157,d:"05.05.26",g:6,a:200},10583:{s:2,c:328,d:"09.12.25",g:153,a:126},10584:{s:2,c:259,d:"20.05.25",g:356,a:24},10585:{s:2,c:556,d:"27.01.26",g:104,a:150},10586:{s:5,c:491,d:"06.03.26",g:66,a:67},10587:{s:1,c:22,d:"07.04.25",g:399,a:0},10588:{s:6,c:65582,d:"15.04.26",g:26,a:38},10589:{s:1,c:281,d:"08.04.25",g:398,a:0},10590:{s:11,c:18942,d:"08.05.26",g:3,a:36},10591:{s:2,c:2494,d:"09.12.25",g:153,a:122},10592:{s:1,c:204,d:"14.04.25",g:392,a:0},10593:{s:1,c:0,d:"14.04.25",g:392,a:0},10594:{s:4,c:391,d:"23.04.26",g:18,a:94},10595:{s:7,c:3447,d:"25.03.26",g:47,a:48},10596:{s:9,c:726,d:"07.01.26",g:124,a:29},10597:{s:5,c:1388,d:"09.10.25",g:214,a:34},10598:{s:10,c:13049,d:"21.04.26",g:20,a:36},10599:{s:3,c:6347,d:"22.12.25",g:140,a:81},10600:{s:6,c:3223,d:"09.04.26",g:32,a:58},10601:{s:1,c:4462,d:"24.04.25",g:382,a:0},10602:{s:1,c:984,d:"25.04.25",g:381,a:0},10603:{s:3,c:2446,d:"08.05.26",g:3,a:126},10604:{s:2,c:350,d:"18.12.25",g:144,a:118},10605:{s:1,c:3236,d:"30.04.25",g:376,a:0},10606:{s:2,c:1283,d:"05.12.25",g:157,a:110},10607:{s:1,c:1585,d:"02.05.25",g:374,a:0},10608:{s:2,c:1169,d:"27.10.25",g:196,a:89},10609:{s:3,c:1030,d:"03.12.25",g:159,a:71},10610:{s:3,c:1265,d:"23.01.26",g:108,a:88},10611:{s:2,c:1058,d:"02.06.25",g:343,a:14},10612:{s:8,c:2041,d:"10.11.25",g:182,a:23},10613:{s:1,c:92,d:"12.05.25",g:364,a:0},10614:{s:5,c:27321,d:"24.02.26",g:76,a:56},10616:{s:2,c:1177,d:"20.02.26",g:80,a:137},10618:{s:3,c:1691,d:"16.04.26",g:25,a:64},10619:{s:3,c:2979,d:"21.10.25",g:202,a:48},10620:{s:10,c:10230,d:"23.04.26",g:18,a:33},10621:{s:11,c:8515,d:"08.05.26",g:3,a:31},10622:{s:2,c:561,d:"23.12.25",g:139,a:101},10624:{s:1,c:298,d:"13.06.25",g:332,a:0},10625:{s:1,c:646,d:"17.06.25",g:328,a:0},10627:{s:2,c:451,d:"27.03.26",g:45,a:142},10628:{s:1,c:448,d:"18.06.25",g:327,a:0},10629:{s:2,c:8050,d:"03.07.25",g:312,a:8},10631:{s:1,c:0,d:"18.06.25",g:327,a:0},10632:{s:1,c:628,d:"23.06.25",g:322,a:0},10634:{s:2,c:562,d:"06.02.26",g:94,a:114},10635:{s:1,c:132,d:"24.06.25",g:321,a:0},10636:{s:2,c:172,d:"01.10.25",g:222,a:49},10637:{s:6,c:4568,d:"26.02.26",g:74,a:41},10638:{s:3,c:1123,d:"16.03.26",g:56,a:88},10639:{s:3,c:148,d:"27.08.25",g:257,a:19},10640:{s:1,c:0,d:"30.06.25",g:315,a:0},10641:{s:1,c:556,d:"30.06.25",g:315,a:0},10643:{s:2,c:675,d:"10.02.26",g:90,a:111},10644:{s:3,c:562,d:"23.01.26",g:108,a:68},10646:{s:1,c:384,d:"07.07.25",g:308,a:0},10647:{s:1,c:144,d:"27.02.26",g:73,a:0},10648:{s:1,c:72,d:"07.07.25",g:308,a:0},10649:{s:1,c:2603,d:"30.06.25",g:315,a:0},10650:{s:1,c:112,d:"09.07.25",g:306,a:0},10651:{s:1,c:6935,d:"11.07.25",g:304,a:0},10652:{s:1,c:2520,d:"16.07.25",g:299,a:0},10653:{s:5,c:9432,d:"21.04.26",g:20,a:56},10654:{s:2,c:2094,d:"20.02.26",g:80,a:109},10655:{s:4,c:9092,d:"18.12.25",g:144,a:38},10658:{s:1,c:157,d:"29.07.25",g:286,a:0},10659:{s:2,c:157,d:"04.05.26",g:7,a:140},10660:{s:6,c:8645,d:"06.10.25",g:217,a:11},10662:{s:10,c:7704,d:"23.12.25",g:139,a:14},10663:{s:8,c:887,d:"24.02.26",g:76,a:24},10664:{s:2,c:281,d:"07.05.26",g:4,a:133},10665:{s:2,c:990,d:"08.04.26",g:33,a:118},10666:{s:1,c:47,d:"19.08.25",g:265,a:0},10667:{s:1,c:381,d:"20.08.25",g:264,a:0},10668:{s:2,c:2929,d:"16.04.26",g:25,a:120},10669:{s:1,c:281,d:"21.08.25",g:263,a:0},10670:{s:1,c:1404,d:"26.08.25",g:258,a:0},10671:{s:1,c:214,d:"27.08.25",g:257,a:0},10672:{s:2,c:951,d:"10.11.25",g:182,a:34},10673:{s:3,c:16620,d:"02.02.26",g:98,a:42},10675:{s:4,c:8312,d:"07.05.26",g:4,a:60},10676:{s:1,c:45,d:"10.09.25",g:243,a:0},10677:{s:7,c:22266,d:"03.11.25",g:189,a:8},10678:{s:2,c:850,d:"09.10.25",g:214,a:14},10679:{s:2,c:589,d:"26.02.26",g:74,a:84},10680:{s:1,c:131,d:"11.09.25",g:242,a:0},10681:{s:3,c:2997,d:"08.05.26",g:3,a:79},10682:{s:2,c:4715,d:"09.12.25",g:153,a:41},10683:{s:4,c:3107,d:"18.02.26",g:82,a:38},10684:{s:1,c:80,d:"17.09.25",g:236,a:0},10685:{s:4,c:12372,d:"08.04.26",g:33,a:50},10686:{s:2,c:2268,d:"16.12.25",g:146,a:42},10687:{s:1,c:1251,d:"24.09.25",g:229,a:0},10689:{s:1,c:306,d:"25.09.25",g:228,a:0},10691:{s:4,c:4848,d:"11.03.26",g:61,a:40},10692:{s:1,c:112,d:"02.10.25",g:221,a:0},10693:{s:1,c:3994,d:"07.10.25",g:216,a:0},10694:{s:1,c:50,d:"03.10.25",g:220,a:0},10695:{s:2,c:1696,d:"16.04.26",g:25,a:96},10696:{s:1,c:3828,d:"08.10.25",g:215,a:0},10697:{s:2,c:1319,d:"03.03.26",g:69,a:72},10698:{s:1,c:836,d:"09.10.25",g:214,a:0},10699:{s:4,c:1267,d:"23.03.26",g:49,a:40},10700:{s:1,c:2940,d:"03.11.25",g:189,a:0},10701:{s:2,c:7895,d:"29.10.25",g:194,a:0},10702:{s:1,c:3118,d:"23.10.25",g:200,a:0},10703:{s:2,c:889,d:"25.03.26",g:47,a:80},10704:{s:5,c:1585,d:"08.05.26",g:3,a:41},10705:{s:1,c:0,d:"20.10.25",g:203,a:0},10706:{s:2,c:2823,d:"13.01.26",g:118,a:42},10707:{s:2,c:8886,d:"23.10.25",g:200,a:0},10708:{s:2,c:0,d:"02.12.25",g:160,a:4},10709:{s:4,c:2197,d:"08.05.26",g:3,a:48},10710:{s:4,c:2489,d:"25.02.26",g:75,a:28},10711:{s:2,c:2071,d:"18.02.26",g:82,a:52},10712:{s:3,c:1663,d:"16.02.26",g:84,a:34},10713:{s:1,c:544,d:"05.11.25",g:187,a:0},10715:{s:1,c:1022,d:"10.11.25",g:182,a:0},10716:{s:1,c:94,d:"14.11.25",g:178,a:0},10717:{s:3,c:2800,d:"12.12.25",g:150,a:8},10718:{s:1,c:533,d:"20.11.25",g:172,a:0},10719:{s:1,c:1374,d:"20.11.25",g:172,a:0},10720:{s:3,c:776,d:"20.02.26",g:80,a:31},10721:{s:1,c:954,d:"20.11.25",g:172,a:0},10722:{s:1,c:1052,d:"25.11.25",g:167,a:0},10723:{s:1,c:2931,d:"20.11.25",g:172,a:0},10724:{s:3,c:1641,d:"23.03.26",g:49,a:41},10726:{s:1,c:121,d:"03.12.25",g:159,a:0},10727:{s:3,c:468,d:"23.01.26",g:108,a:17},10729:{s:1,c:1155,d:"04.12.25",g:158,a:0},10732:{s:1,c:463,d:"05.12.25",g:157,a:0},10734:{s:1,c:512,d:"11.12.25",g:151,a:0},10735:{s:5,c:106,d:"15.01.26",g:116,a:7},10736:{s:2,c:94,d:"01.04.26",g:40,a:54},10737:{s:1,c:773,d:"16.12.25",g:146,a:0},10738:{s:1,c:495,d:"16.12.25",g:146,a:0},10739:{s:2,c:1976,d:"11.03.26",g:61,a:42},10740:{s:2,c:936,d:"11.03.26",g:61,a:42},10741:{s:3,c:7378,d:"29.04.26",g:12,a:44},10742:{s:1,c:5878,d:"17.12.25",g:145,a:0},10743:{s:2,c:248,d:"29.12.25",g:133,a:4},10744:{s:2,c:1569,d:"21.04.26",g:20,a:60},10745:{s:1,c:142,d:"24.12.25",g:138,a:0},10747:{s:1,c:882,d:"16.01.26",g:115,a:0},10748:{s:1,c:414,d:"20.01.26",g:111,a:0},10750:{s:1,c:252,d:"27.01.26",g:104,a:0},10751:{s:1,c:738,d:"30.01.26",g:101,a:0},10752:{s:2,c:8628,d:"20.04.26",g:21,a:40},10753:{s:2,c:1268,d:"21.04.26",g:20,a:40},10754:{s:1,c:1589,d:"07.02.26",g:93,a:0},10755:{s:1,c:548,d:"11.02.26",g:89,a:0},10756:{s:2,c:12889,d:"19.03.26",g:53,a:0},10757:{s:1,c:321,d:"20.02.26",g:80,a:0},10758:{s:1,c:338,d:"21.02.26",g:79,a:0},10759:{s:1,c:300,d:"25.02.26",g:75,a:0},10760:{s:3,c:4317,d:"06.03.26",g:66,a:3},10761:{s:2,c:892,d:"27.02.26",g:73,a:0},10762:{s:2,c:2161,d:"08.04.26",g:33,a:18},10763:{s:1,c:407,d:"13.03.26",g:59,a:0},10765:{s:1,c:4733,d:"16.03.26",g:56,a:0},10767:{s:1,c:9406,d:"30.03.26",g:42,a:0},10768:{s:1,c:489,d:"26.03.26",g:46,a:0},10769:{s:1,c:62,d:"01.04.26",g:40,a:0},10770:{s:1,c:1184,d:"08.04.26",g:33,a:0},10774:{s:2,c:754,d:"08.05.26",g:3,a:11},10775:{s:1,c:84,d:"16.04.26",g:25,a:0},10776:{s:1,c:393,d:"24.04.26",g:17,a:0},10777:{s:4,c:498,d:"08.05.26",g:3,a:1},10778:{s:1,c:51,d:"05.05.26",g:6,a:0},10779:{s:1,c:284,d:"05.05.26",g:6,a:0},10781:{s:1,c:720,d:"07.05.26",g:4,a:0}};
+
+// ====== POTANSIYEL MÜŞTERILER ======
+const POTENTIALS = [
+// 🍽 RESTORANLAR — 20 BÜYÜK ŞEHİR
+// === DÜSSELDORF ===
+{id:104,cat:"🍽 Restoranlar",name:"Libanon Restaurant Düsseldorf",city:"Düsseldorf",addr:"Düsseldorf",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Cuma-Cumartesi belly dance. 1001 Nacht özel salonu. Şarap & içki servisi aktif. Türk şarabı menüye girebilir.",prio:"B",status:"Aranmadı",nrw:true},
+{id:105,cat:"🍽 Restoranlar",name:"Li Beirut Restaurant",city:"Düsseldorf",addr:"Belsenpl. 3, 40545 Düsseldorf",phone:"+49 211 15866542",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Oberkassel'de Lübnanlı restoran. Mezze odaklı, içki servisi mevcut. Türk şarabını Akdeniz şarabı olarak konumlandır.",prio:"B",status:"Aranmadı",nrw:true},
+{id:106,cat:"🍽 Restoranlar",name:"Taverna Toxotis",city:"Düsseldorf",addr:"Düsseldorf, 40474",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Düsseldorf Yunan restoranı. Geniş şarap listesi. Türk şarabı Akdeniz çeşitliliği olarak sunulabilir.",prio:"B",status:"Aranmadı",nrw:true},
+// === KÖLN ===
+{id:107,cat:"🍽 Restoranlar",name:"ArtIstanbul Restaurant",city:"Köln",addr:"Komödienstraße, Köln",phone:"",email:"",contact:"Serhat Cokgezen (Kurucu/Oyuncu)",buying:"Yerinde ziyaret",note:"Köln'ün en bilinen Türk restoranı. Rakı, wein, müzik. 'Abends entfaltet Artistanbul sein Flair — Raki, Wein, Musik.' Türk şarabı zaten gündemde.",prio:"A",status:"Aranmadı",nrw:true},
+{id:110,cat:"🍽 Restoranlar",name:"Kilim Restaurant Köln",city:"Köln",addr:"Köln",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Köln'de rakı servis eden nadir Türk restoranlarından. 'Raki zum Essen genießen – eine Rarität.' Doğrudan rakı konuşması yapılabilir.",prio:"A",status:"Aranmadı",nrw:true},
+{id:111,cat:"🍽 Restoranlar",name:"Mevlana Restaurant Köln",city:"Köln",addr:"Köln",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Köln'de geleneksel Türk restoranı. Oriental flair. İçki servisi mevcut.",prio:"B",status:"Aranmadı",nrw:true},
+{id:112,cat:"🍽 Restoranlar",name:"Taverna Mythos Köln",city:"Köln",addr:"Köln",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Köln Yunan restoranı. Şarap listesi mevcut. Türk şarabını Akdeniz çeşidi olarak sun.",prio:"B",status:"Aranmadı",nrw:true},
+// === BERLİN ===
+{id:113,cat:"🍽 Restoranlar",name:"Hayal Kahvesi Meyhane",city:"Berlin",addr:"Berlin",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"'Erlesene Weine, hochwertiges Raki' — aktif meyhane kültürü. Berlin'in en otantik Türk meyhane deneyimi. Rakı & şarap tedarikçisi ara.",prio:"A",status:"Aranmadı",nrw:false},
+{id:114,cat:"🍽 Restoranlar",name:"FES Turkish BBQ",city:"Berlin",addr:"Berlin Kreuzberg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Tischgrill konsepti. Rakı servisi aktif. Geniş bahçe terası. Berlin'de popüler.",prio:"A",status:"Aranmadı",nrw:false},
+{id:115,cat:"🍽 Restoranlar",name:"Tugra Restaurant",city:"Berlin",addr:"Berlin Charlottenburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Turkish Fine Dining Berlin. Şarap listesi aktif — 'lass dir unbedingt den passenden Wein empfehlen.' Türk şarabı için hazır zemin.",prio:"A",status:"Aranmadı",nrw:false},
+{id:116,cat:"🍽 Restoranlar",name:"Müsterek Meyhane",city:"Berlin",addr:"Wallstraße, Berlin Mitte",phone:"",email:"",contact:"Cihan Ilter (Kurucu)",buying:"Yerinde ziyaret",note:"Berlin'in yeni meyhane kültürü. 'Man isst Mezes, trinkt Raki und atmet das Lebensgefühl Istanbuls.' Premium rakı & şarap kullanıcısı.",prio:"A",status:"Aranmadı",nrw:false},
+{id:117,cat:"🍽 Restoranlar",name:"Byblos Restaurant Berlin",city:"Berlin",addr:"Berlin Mitte",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Premium Lübnanlı restoran Berlin. 'Das Leben feiern.' Şarap ve içki servisi. Türk şarabını Doğu Akdeniz çeşidi olarak konumlandır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:118,cat:"🍽 Restoranlar",name:"Qadmous Restaurant",city:"Berlin",addr:"Berlin Prenzlauer Berg / Mitte",phone:"030 424 62 55",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Lübnanlı/Arap restoran. Berlin Prenzlauer Berg yakını. Telefon mevcut — arayabilirsin.",prio:"B",status:"Aranmadı",nrw:false},
+{id:119,cat:"🍽 Restoranlar",name:"Baba Angora",city:"Berlin",addr:"Berlin, 10629",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk restoranı Berlin. İçki servisi mevcut.",prio:"B",status:"Aranmadı",nrw:false},
+{id:120,cat:"🍽 Restoranlar",name:"Pamfilya Restaurant",city:"Berlin",addr:"Berlin Leopoldplatz",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk restoranı, tischgrill, raki servisi. Berlin'de köklü mekan.",prio:"B",status:"Aranmadı",nrw:false},
+{id:121,cat:"🍽 Restoranlar",name:"Taverna Athene Berlin",city:"Berlin",addr:"Berlin Charlottenburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Berlin Yunan restoranı. Şarap listesi. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:false},
+// === HAMBURG ===
+{id:122,cat:"🍽 Restoranlar",name:"Fischerhaus by Beyoğlu",city:"Hamburg",addr:"St. Pauli Fischmarkt 14, 20359 Hamburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"'6 farklı rakı çeşidi sunuluyor.' Hamburg'un ikonik balık lokantası Türk kimliğiyle birleşti. Rakı tedarikçisi olarak bağlan.",prio:"A",status:"Aranmadı",nrw:false},
+{id:123,cat:"🍽 Restoranlar",name:"LOKMAM Restaurant Hamburg",city:"Hamburg",addr:"Hamburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk mutfağı, meze odaklı, Hamburg. Genişletilmekte olan içki listesi.",prio:"B",status:"Aranmadı",nrw:false},
+{id:125,cat:"🍽 Restoranlar",name:"Bistro L'Emir Hamburg",city:"Hamburg",addr:"Hamburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Lübnanlı restoran Hamburg. 'Erlesene Weine' — seçkin şarap listesi. Türk şarabı Doğu Akdeniz çeşidi olarak ideal.",prio:"B",status:"Aranmadı",nrw:false},
+{id:126,cat:"🍽 Restoranlar",name:"Nostimare Griechisches Restaurant",city:"Hamburg",addr:"Hamburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Hamburg'da Yunan restoranı. Şarap & Ouzo odaklı menü. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:false},
+{id:127,cat:"🍽 Restoranlar",name:"Restaurant Opatija Hamburg",city:"Hamburg",addr:"Hamburg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Hırvatistan mutfağı, Hamburg. Adriyatik şarapları mevcut. Türk şarabı yeni keşif olarak sunulabilir.",prio:"C",status:"Aranmadı",nrw:false},
+// === MÜNCHEN ===
+{id:128,cat:"🍽 Restoranlar",name:"Kyano Restaurant",city:"München",addr:"München Süd",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — kyano.eu",note:"'Erlesene griechische Weine.' Premium Yunan restoranı. Şarap konusunda özenli. Türk şarabı Anadolu çeşidi olarak çok iyi konumlanır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:129,cat:"🍽 Restoranlar",name:"Elia Restaurant München",city:"München",addr:"München Schwabing",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — elia-restaurant.de",note:"Premium Yunan restoranı München. 'Gutes Essen, gute Weine.' Şarap bütçesi yüksek.",prio:"B",status:"Aranmadı",nrw:false},
+{id:130,cat:"🍽 Restoranlar",name:"Opson Restaurant München",city:"München",addr:"Trappentreustr. 33, München Westend",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — opson.de",note:"'Erlesene griechische Weine bei südländischem Ambiente.' Şarap çok önemli. Türk şarabı Ege ve Anadolu kökenli olarak sun.",prio:"B",status:"Aranmadı",nrw:false},
+{id:131,cat:"🍽 Restoranlar",name:"apla'funky Restaurant",city:"München",addr:"München Westend",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — aplafunky.com",note:"Modern Yunan restoranı. Şarap vurgusu yüksek. Türk şarabı Anadolu keşfi olarak konumlandır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:132,cat:"🍽 Restoranlar",name:"Aliki Munich",city:"München",addr:"München",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — alikimunich.de",note:"Otantik Yunan restoranı München. Şarap & Ouzo odaklı. Türk şarabı iyi uyum sağlar.",prio:"C",status:"Aranmadı",nrw:false},
+{id:133,cat:"🍽 Restoranlar",name:"Moro Mou München",city:"München",addr:"München Schwabing",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Party Grieche, hafta sonu canlı müzik. Büyük teras. Geniş içki listesi. Türk şarabı Meze ile eşleştirilebilir.",prio:"C",status:"Aranmadı",nrw:false},
+{id:134,cat:"🍽 Restoranlar",name:"Istanbul Restaurant München",city:"München",addr:"München",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk restoranı München. İçki servisi. Rakı & şarap odaklı.",prio:"B",status:"Aranmadı",nrw:false},
+// === FRANKFURT ===
+{id:135,cat:"🍽 Restoranlar",name:"du Liban Restaurant",city:"Frankfurt am Main",addr:"Weserstraße 17 (im Ramada-Hotel), 60329 Frankfurt",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — du-liban.de",note:"'Exzellente libanesische Weine.' Frankfurt'ta premium Lübnanlı. Kendi online şarap mağazası var. Türk şarabı Doğu Akdeniz çeşidi olarak sunulabilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:136,cat:"🍽 Restoranlar",name:"Restaurant Akropolis Frankfurt",city:"Frankfurt am Main",addr:"Frankfurt am Main",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Frankfurt Yunan restoranı. Şarap & Ouzo servisi. Türk şarabı yeni keşif.",prio:"C",status:"Aranmadı",nrw:false},
+{id:137,cat:"🍽 Restoranlar",name:"Taverna Kalimera Frankfurt",city:"Frankfurt am Main",addr:"Frankfurt am Main",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Frankfurt Yunan restoranı. Aktif şarap menüsü.",prio:"C",status:"Aranmadı",nrw:false},
+{id:138,cat:"🍽 Restoranlar",name:"Istanbul Meze Frankfurt",city:"Frankfurt am Main",addr:"Frankfurt am Main",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk meze restoranı Frankfurt. Rakı & şarap servisi mevcut.",prio:"B",status:"Aranmadı",nrw:false},
+{id:139,cat:"🍽 Restoranlar",name:"Duble Meze Grill Frankfurt",city:"Frankfurt am Main",addr:"Frankfurt am Main, 60389",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk meze & grill. Rakı menüde. İçki listesi genişletilebilir.",prio:"B",status:"Aranmadı",nrw:false},
+// === STUTTGART ===
+{id:141,cat:"🍽 Restoranlar",name:"Kovas Balkan Restaurant",city:"Böblingen (Stuttgart)",addr:"Böblingen, Stuttgart yakını",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — kovas-balkan.de",note:"Hırvat/Balkan mutfağı Böblingen. Geniş içki listesi. Türk şarabı Balkan çeşidi olarak entegre edilebilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:142,cat:"🍽 Restoranlar",name:"Restaurant Akropolis Stuttgart",city:"Stuttgart",addr:"Stuttgart",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Stuttgart Yunan restoranı. Şarap servisi. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:false},
+{id:143,cat:"🍽 Restoranlar",name:"Taverna Rhodos Stuttgart",city:"Stuttgart",addr:"Stuttgart",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Stuttgart Yunan restoranı. Aktif içki menüsü.",prio:"C",status:"Aranmadı",nrw:false},
+// === DORTMUND ===
+{id:144,cat:"🍽 Restoranlar",name:"KARA'S Restaurant",city:"Dortmund",addr:"Dortmund",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret — karas-restaurant.com",note:"'Mediterrane Weine (türkisch/griechisch)' — zaten Türk şarabı sergiliyor! Tedarikçiyi güçlendir. Dortmund'un öne çıkan Türk-Yunan restoranı.",prio:"A",status:"Aranmadı",nrw:true},
+{id:145,cat:"🍽 Restoranlar",name:"Serres Grill Dortmund",city:"Dortmund",addr:"Dortmund",phone:"+49 0231 96738330",email:"nbogatinis@googlemail.com",contact:"N. Bogatinis (İşletmeci)",buying:"E-posta veya telefon",note:"Yunan restoran. Alkol servisi mevcut. Telefon & e-posta adresi doğrulandı — direkt iletişim mümkün.",prio:"B",status:"Aranmadı",nrw:true},
+{id:146,cat:"🍽 Restoranlar",name:"Akropolis Restaurant Dortmund",city:"Dortmund",addr:"Hohe Str. 73, 44139 Dortmund",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Dortmund merkez Yunan restoranı. Şarap listesi. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:true},
+{id:147,cat:"🍽 Restoranlar",name:"Eski Usul Meyhane by Anka Events",city:"Dortmund",addr:"Dortmund, 44339",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Klasik meyhane konsepti Dortmund. Rakı & şarap odaklı. Doğrudan rakı konuşması yap.",prio:"A",status:"Aranmadı",nrw:true},
+// === HANNOVER ===
+{id:148,cat:"🍽 Restoranlar",name:"Restaurant Adana Hannover",city:"Hannover",addr:"Roscherstraße 3, 30161 Hannover",phone:"0511/8093805",email:"",contact:"İşletmeci",buying:"Telefon: 0511/8093805",note:"Hannover Türk restoranı. Telefon doğrulandı. Adana tarzı et ağırlıklı. Rakı servisi muhtemel.",prio:"B",status:"Aranmadı",nrw:false},
+{id:150,cat:"🍽 Restoranlar",name:"Taverna Athen Hannover",city:"Hannover",addr:"Hannover",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"41 Hannover Yunan restoranı var (stadtbranchenbuch). Büyük potansiyel. Önce en büyük & şarap odaklı olanları tespit et.",prio:"B",status:"Aranmadı",nrw:false},
+{id:151,cat:"🍽 Restoranlar",name:"Sultan Palace GmbH Hannover",city:"Hannover",addr:"Hannover, 30419",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Hannover Türk restoranı. İçki servisi var. Tedarik görüşmesi yapılabilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:152,cat:"🍽 Restoranlar",name:"Zazana Kneipe Hannover",city:"Hannover",addr:"Hannover, 30167",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Hannover'de bar/restoran. İçki servisi aktif.",prio:"C",status:"Aranmadı",nrw:false},
+// === NÜRNBERG ===
+{id:153,cat:"🍽 Restoranlar",name:"Istanbul Restaurant Nürnberg",city:"Nürnberg",addr:"Nürnberg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Nürnberg Türk restoranı. Rakı & şarap servisi.",prio:"B",status:"Aranmadı",nrw:false},
+{id:154,cat:"🍽 Restoranlar",name:"Akropolis Restaurant Nürnberg",city:"Nürnberg",addr:"Nürnberg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Nürnberg Yunan restoranı. Şarap & Ouzo servisi.",prio:"C",status:"Aranmadı",nrw:false},
+{id:155,cat:"🍽 Restoranlar",name:"Taverna Athen Nürnberg",city:"Nürnberg",addr:"Nürnberg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Nürnberg Yunan restoranı. Aktif şarap menüsü.",prio:"C",status:"Aranmadı",nrw:false},
+{id:156,cat:"🍽 Restoranlar",name:"ASK Gastrovertrieb GmbH Nürnberg",city:"Nürnberg",addr:"Nürnberg, 90441",phone:"0911.6200189",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Nürnberg gastronomi firması. İletişim bilgisi mevcut. Türk ürünleri dağıtımı için araştır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:157,cat:"🍽 Restoranlar",name:"Restaurant Mykonos Nürnberg",city:"Nürnberg",addr:"Nürnberg",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Nürnberg Yunan restoranı. Şarap odaklı.",prio:"C",status:"Aranmadı",nrw:false},
+// === ESSEN ===
+{id:158,cat:"🍽 Restoranlar",name:"WeinCafe Cuvee Essen",city:"Essen",addr:"Essen, 45219",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Essen şarap kafesi. Türk şarabı için açık olabilir. İlk görüşme yap.",prio:"A",status:"Aranmadı",nrw:true},
+{id:159,cat:"🍽 Restoranlar",name:"Taverna Athen Essen",city:"Essen",addr:"Essen",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Essen Yunan restoranı. Şarap & Ouzo servisi.",prio:"C",status:"Aranmadı",nrw:true},
+{id:160,cat:"🍽 Restoranlar",name:"Bigchefs Centro Essen",city:"Essen",addr:"Essen, 45143",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Türk restoran zinciri. Büyük kapasite. Şarap listesi var. Türk şarabı eklemek için hazır zemin.",prio:"A",status:"Aranmadı",nrw:true},
+{id:161,cat:"🍽 Restoranlar",name:"Lujo Restaurant & Seecafé am Baldeneysee",city:"Essen",addr:"Essen, 45239",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Gölkenarında premium restoran. Şarap odaklı. Türk şarabı sürpriz keşif olarak sun.",prio:"B",status:"Aranmadı",nrw:true},
+// === DUISBURG ===
+{id:162,cat:"🍽 Restoranlar",name:"Zeugma Restobar Duisburg",city:"Duisburg",addr:"Duisburg, 47057",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Türk bar & restoran Duisburg. İçki odaklı. Rakı & şarap tedarikçisi ara.",prio:"B",status:"Aranmadı",nrw:true},
+{id:163,cat:"🍽 Restoranlar",name:"Akustik Fisch & Steak House Duisburg",city:"Duisburg",addr:"Duisburg, 47057",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Fisch & Steak — iyi şarap listesi potansiyeli. Türk şarabını Fisch ile eşleştir.",prio:"B",status:"Aranmadı",nrw:true},
+{id:164,cat:"🍽 Restoranlar",name:"Marina Fish House Duisburg",city:"Duisburg",addr:"Duisburg, 47057",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Balık restoranı Duisburg. Şarap listesi mevcut. Türk şarabı deniz ürünleriyle eşleştirilir.",prio:"B",status:"Aranmadı",nrw:true},
+// === BOCHUM ===
+{id:165,cat:"🍽 Restoranlar",name:"Sofra Türkisches Restaurant Bochum",city:"Bochum",addr:"Bochum, 44787",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Bochum Türk restoranı. İçki servisi. Rakı & şarap.",prio:"B",status:"Aranmadı",nrw:true},
+{id:166,cat:"🍽 Restoranlar",name:"Mina GmbH Restaurant Side Bochum",city:"Bochum",addr:"Bochum, 44879",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Bochum restoranı. GmbH yapısı — karar alıcıyla görüş.",prio:"B",status:"Aranmadı",nrw:true},
+{id:167,cat:"🍽 Restoranlar",name:"Taverna Athen Bochum",city:"Bochum",addr:"Bochum",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Bochum Yunan restoranı. Şarap servisi. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:true},
+// === WUPPERTAL ===
+{id:168,cat:"🍽 Restoranlar",name:"Restaurant Croatien Wuppertal",city:"Wuppertal",addr:"Südstr. 10, Wuppertal (Luisenviertel)",phone:"0202 313128",email:"",contact:"İşletmeci",buying:"Telefon: 0202 313128",note:"Hırvat restoranı. Telefon mevcut. Düzenli şarap alıcısı. Türk şarabı Adriyatik çeşidi olarak sunulabilir.",prio:"B",status:"Aranmadı",nrw:true},
+{id:169,cat:"🍽 Restoranlar",name:"Restaurant Esskultürk Wuppertal",city:"Wuppertal",addr:"Wuppertal, 42285",phone:"0202 253 49 135",email:"",contact:"İşletmeci",buying:"Telefon: 0202 253 49 135",note:"Wuppertal Türk restoranı. Telefon mevcut. İçki servisi muhtemel.",prio:"B",status:"Aranmadı",nrw:true},
+{id:170,cat:"🍽 Restoranlar",name:"Troja Cafe und Restaurant Wuppertal",city:"Wuppertal",addr:"Wuppertal, 42103",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Wuppertal Türk restoranı. İçki servisi.",prio:"B",status:"Aranmadı",nrw:true},
+// === BİELEFELD ===
+{id:171,cat:"🍽 Restoranlar",name:"Meydan Gastro GmbH Bielefeld",city:"Bielefeld",addr:"Bielefeld, 33602",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Bielefeld GmbH yapısı Türk restoran. Karar alıcıyla görüş. İçki servisi araştır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:172,cat:"🍽 Restoranlar",name:"By Yol Restaurant Café Bar Bielefeld",city:"Bielefeld",addr:"Bielefeld, 33602",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Bielefeld Türk cafe & bar. İçki servisi var. Rakı & şarap tedariki.",prio:"B",status:"Aranmadı",nrw:false},
+{id:173,cat:"🍽 Restoranlar",name:"Naane GmbH Bielefeld",city:"Bielefeld",addr:"Bielefeld, 33602",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Bielefeld Türk restoranı GmbH. İçki servisi araştır.",prio:"B",status:"Aranmadı",nrw:false},
+// === BONN ===
+{id:174,cat:"🍽 Restoranlar",name:"Görres Gastro GmbH Koblenz/Bonn",city:"Koblenz",addr:"Koblenz, 56068",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Gastronomi GmbH. Köln-Bonn bölgesi. İçki servisi araştır.",prio:"B",status:"Aranmadı",nrw:true},
+{id:175,cat:"🍽 Restoranlar",name:"Taverna Athen Bonn",city:"Bonn",addr:"Bonn",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"12 kroatik restoran var Bonn'da (bonnbranchen). Yunan & Türk restoranlar da güçlü. Önce en büyükleriyle görüş.",prio:"B",status:"Aranmadı",nrw:true},
+{id:176,cat:"🍽 Restoranlar",name:"Rest. Zur Buhne Bonn GmbH",city:"Bonn",addr:"Bonn, 53111",phone:"0228-60889443",email:"",contact:"GF",buying:"Telefon: 0228-60889443",note:"Bonn restoran GmbH. Telefon mevcut. Türk şarabı görüşmesi için ara.",prio:"B",status:"Aranmadı",nrw:true},
+// === MÜNSTER ===
+{id:179,cat:"🍽 Restoranlar",name:"Tajora GmbH Münster",city:"Münster",addr:"Münster, 48143",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Münster restoran GmbH. İçki lisansı araştır.",prio:"B",status:"Aranmadı",nrw:false},
+// === LEIPZIG ===
+{id:180,cat:"🍽 Restoranlar",name:"Istanbul Restaurant Leipzig",city:"Leipzig",addr:"Leipzig",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Leipzig Türk restoranı. Rakı & şarap servisi araştır.",prio:"B",status:"Aranmadı",nrw:false},
+{id:181,cat:"🍽 Restoranlar",name:"Taverna Acropolis Leipzig",city:"Leipzig",addr:"Leipzig",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Leipzig Yunan restoranı. Şarap servisi. Türk şarabı Akdeniz çeşidi.",prio:"C",status:"Aranmadı",nrw:false},
+{id:182,cat:"🍽 Restoranlar",name:"Orient Restaurant Leipzig",city:"Leipzig",addr:"Leipzig",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Leipzig oryantal/mediterran restoran. İçki servisi var.",prio:"C",status:"Aranmadı",nrw:false},
+// === BREMEN ===
+{id:183,cat:"🍽 Restoranlar",name:"Gusto Grosshandel GmbH Bremen",city:"Bremen",addr:"Bremen, 28217",phone:"0421.83945550",email:"",contact:"GF",buying:"Telefon: 0421.83945550",note:"Bremen gastronomi & gıda toptancısı. Türk ürünleri satma potansiyeli. Zaten sistemde.",prio:"A",status:"Aranmadı",nrw:false},
+{id:184,cat:"🍽 Restoranlar",name:"Akropolis Restaurant Bremen",city:"Bremen",addr:"Bremen",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Bremen Yunan restoranı. Şarap servisi.",prio:"C",status:"Aranmadı",nrw:false},
+{id:185,cat:"🍽 Restoranlar",name:"Istanbul Restaurant Bremen",city:"Bremen",addr:"Bremen",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Bremen Türk restoranı. Rakı & şarap servisi araştır.",prio:"B",status:"Aranmadı",nrw:false},
+// === DRESDEN ===
+{id:186,cat:"🍽 Restoranlar",name:"Ocakbasi Altstadt UG Dresden",city:"Dresden",addr:"Dresden, 01067",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Dresden Türk ocakbası. İçki servisi araştır. Rakı & şarap konuşması yap.",prio:"B",status:"Aranmadı",nrw:false},
+{id:187,cat:"🍽 Restoranlar",name:"Selin Food GmbH Dresden",city:"Dresden",addr:"Dresden, 01139",phone:"",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"Dresden gıda GmbH. Türk bağlantılı. İçki servisi araştır.",prio:"C",status:"Aranmadı",nrw:false},
+{id:188,cat:"🍽 Restoranlar",name:"Taverna Athen Dresden",city:"Dresden",addr:"Dresden",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Dresden Yunan restoranı. Şarap servisi.",prio:"C",status:"Aranmadı",nrw:false},
+// === STRATEJİK NOTLAR ===
+{id:190,cat:"🍽 Restoranlar",name:"Yeni açılan içki lisanslı Türk restoranları — haftalık tarama",city:"NRW + Almanya geneli",addr:"",phone:"",email:"",contact:"",buying:"Google Maps / Instagram takibi",note:"Haftalık strateji: Google Maps'te 'türkisches Restaurant [şehir] neu eröffnet' ara. Instagram'da #meyhane #türkischesrestaurant takip et. NRW öncelikli.",prio:"A",status:"Takipte",nrw:true},
+// 🥩 STEAKHAUSLAR
+{id:1,cat:"🥩 Steakhauslar",name:"Block House Restaurantbetriebe AG",city:"Hamburg",addr:"Lademannbogen 127, 22339 Hamburg",phone:"+49 40 538 007-0",email:"info@block-house.de",contact:"Carsten Block (CEO)",buying:"Merkezi şarap alımı: Hamburg HQ",note:"Almanya'nın en büyük steakhouse zinciri — 47 şube. Merkezi şarap listesi. Türk şarabını premium alternatif olarak sun.",prio:"A",status:"Aranmadı",nrw:true},
+{id:2,cat:"🥩 Steakhauslar",name:"Maredo Steakhouse GmbH",city:"Berlin",addr:"Unter den Linden 10, 10117 Berlin",phone:"",email:"info@maredo.de",contact:"Yönetim (sorulacak)",buying:"Berlin HQ — info@maredo.de",note:"İflastan sonra yeniden açıldı. 8 aktif şube: Berlin, Dortmund, Frankfurt, Stuttgart, Mülheim. Yeni tedarikçilere açık.",prio:"B",status:"Aranmadı",nrw:true},
+{id:3,cat:"🥩 Steakhauslar",name:"The ASH Restaurant & Bar",city:"Köln",addr:"Hahnenstraße 37, 50667 Köln",phone:"+49 221 6060 8999",email:"info@the-ash.com",contact:"Şef: Hendrik Maas",buying:"Merkezi alım: Köln HQ",note:"NRW'de çok şube! Köln, Düsseldorf, Oberhausen, Troisdorf + Frankfurt, München. Premium şarap listesi. Urla & Porta Caeli ideal.",prio:"A",status:"Aranmadı",nrw:true},
+{id:4,cat:"🥩 Steakhauslar",name:"Peter Pane GmbH",city:"Hamburg",addr:"Sierichstraße 44, 22301 Hamburg",phone:"+49 40 41908370",email:"info@peterpane.de",contact:"GF: Christian Wackernagel",buying:"Hamburg HQ",note:"Modern burger & steak zinciri. NRW şubeleri: Düsseldorf, Köln, Essen, Dortmund. Şarap listesi mevcut.",prio:"B",status:"Aranmadı",nrw:true},
+{id:5,cat:"🥩 Steakhauslar",name:"Grill Royal",city:"Berlin",addr:"Friedrichstraße 105b, 10117 Berlin",phone:"+49 30 28879288",email:"restaurant@grillroyal.com",contact:"Boris Radczun (GF)",buying:"Her şube bağımsız alım yapar",note:"Premium steakhouse — Berlin, Frankfurt, Hamburg. Seçkin müşteri profili. Özel Türk şarap sunumu için uygun.",prio:"B",status:"Aranmadı",nrw:false},
+{id:6,cat:"🥩 Steakhauslar",name:"Ochsengrill Gruner GmbH",city:"Hamburg",addr:"Neuer Wall 13, 20354 Hamburg",phone:"+49 40 4000 5950",email:"info@ochsengrill.de",contact:"Ingo Gruner (Sahip)",buying:"Hamburg HQ",note:"Hamburg geleneksel steakhouse zinciri. Kapsamlı şarap listesiyle tanınır.",prio:"C",status:"Aranmadı",nrw:false},
+{id:7,cat:"🥩 Steakhauslar",name:"Santo Restaurant",city:"Düsseldorf",addr:"Berger Allee 49, 40213 Düsseldorf",phone:"+49 211 8778260",email:"info@santo-restaurant.de",contact:"Şef",buying:"Her şube bağımsız",note:"NRW'de premium steakhouse. Düsseldorf merkezi — ilk temas için ideal.",prio:"A",status:"Aranmadı",nrw:true},
+{id:8,cat:"🥩 Steakhauslar",name:"Surf n Turf Frankfurt",city:"Frankfurt am Main",addr:"Schäfergasse 17, 60313 Frankfurt",phone:"+49 69 9200717",email:"info@surfnturf-frankfurt.de",contact:"Christian Mook (Kurucu)",buying:"Bağımsız Frankfurt alımı",note:"1998'den bu yana Almanya öncü US tarzı steakhousu. Aktif şarap alıcısı.",prio:"B",status:"Aranmadı",nrw:false},
+// 🛒 KIOSK & MARKET
+{id:51,cat:"🛒 Kiosk & Market",name:"Türk Kiosk Ziyaret Stratejisi — NRW",city:"NRW geneli",addr:"",phone:"",email:"",contact:"",buying:"Yerinde ziyaret",note:"NRW Türk kiosk ve minimarketleri. Rakı miniboy (20cl) ve küçük hacimli ürünler için ideal satış noktası.",prio:"B",status:"Takipte",nrw:true},
+{id:52,cat:"🛒 Kiosk & Market",name:"Türk Süpermarket Zincirleri — NRW",city:"NRW geneli",addr:"",phone:"",email:"",contact:"Merkezi satın alma müdürü",buying:"Merkezi alım müdürüyle görüş",note:"NRW'deki orta-büyük Türk süpermarketlerini tespit et. Şarap & rakı reyonu genişletmek isteyenlerle temas kur.",prio:"B",status:"Aranmadı",nrw:true},
+{id:53,cat:"🛒 Kiosk & Market",name:"Nergiz Großmarkt GmbH",city:"Gronau",addr:"Gronau, 48599",phone:"02562 7040",email:"",contact:"GF",buying:"Yerinde ziyaret",note:"NRW büyük Türk gıda marketi. Toplam 5.000+ ürün. Önemli rakı & şarap partneri olabilir.",prio:"A",status:"Aranmadı",nrw:true},
+// 🍷 WEIN-DEPOT & ŞARAP EVLERİ
+{id:10,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Jacques Wein-Depot GmbH",city:"Düsseldorf (NRW!)",addr:"Münsterstraße 7, 40667 Meerbusch",phone:"+49 2132 9199-0",email:"info@jacques-wein-depot.de",contact:"GF: Kathy Féron; Alexander Borwitzky (Satış)",buying:"Merkezi alım: Meerbusch — info@jacques-wein-depot.de",note:"HQ Düsseldorf/NRW'de! 320 depo, 500'e genişleme planı. Merkezi alım sistemi. Türk şarabı 320 depoya girebilir.",prio:"A",status:"Aranmadı",nrw:true},
+{id:14,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Rindchen's Weinkontor GmbH",city:"Hamburg",addr:"Wandsbeker Zollstraße 4, 22041 Hamburg",phone:"+49 40 6527550",email:"info@rindchens.de",contact:"Andreas Rindchen (Kurucu)",buying:"Hamburg HQ",note:"Premium şarap mağazası. Seçkin müşteri profili. Türk premium şarabı iyi konumlandırılabilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:15,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Tesdorpf GmbH",city:"Hamburg",addr:"Tesdorpfstraße 2, 22609 Hamburg",phone:"+49 40 800081-0",email:"info@tesdorpf.de",contact:"GF: Peter Heckmann",buying:"Fine Wine alımı: Hamburg HQ",note:"1678 kuruluş — Almanya'nın en eski şarap evi. Fine Wine uzmanı. Urla, Ament, Porta Caeli buraya çok uyar.",prio:"B",status:"Aranmadı",nrw:false},
+{id:24,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Ludwig v. Kapff — Düsseldorf Şubesi",city:"Düsseldorf",addr:"Königsallee, Düsseldorf",phone:"+49 40 31180-0 (HQ)",email:"wein@kapff.de",contact:"Şube yöneticisi",buying:"Merkezi alım: Hamburg HQ",note:"Kö'de premium şarap mağazası. Yüksek gelirli müşteri profili. Urla & Porta Caeli ideal.",prio:"A",status:"Aranmadı",nrw:true},
+{id:27,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Geile Weine NRW",city:"Düsseldorf",addr:"Düsseldorf",phone:"",email:"info@geilenweine.de",contact:"GF",buying:"Yeni ürünler e-posta ile",note:"NRW tabanlı online şarap mağazası. Genç müşteri kitlesi. Türk şarabı için açık bir platform.",prio:"B",status:"Aranmadı",nrw:true},
+{id:36,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Vinicultura Berlin",city:"Berlin",addr:"Kastanienallee 24, 10435 Berlin",phone:"+49 30 44732208",email:"info@vinicultura.de",contact:"Torsten Rempel (Sahip)",buying:"Yeni üreticiler: info@vinicultura.de",note:"Avrupa dışı şaraplara odaklı Berlin mağazası. Türk şarabı keşif ürünü olarak sunulabilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:38,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Weinhandlung Jens Wenker",city:"Stuttgart",addr:"Stuttgart",phone:"",email:"info@wenker-wein.de",contact:"Jens Wenker (Sahip)",buying:"Yeni üreticiler: info@wenker-wein.de",note:"Stuttgart premium şarap evi.",prio:"B",status:"Aranmadı",nrw:false},
+{id:39,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Mondovino GmbH",city:"München",addr:"München",phone:"",email:"info@mondovino.de",contact:"GF",buying:"Yeni üreticiler: info@mondovino.de",note:"Münih şarap mağazası. Türk şaraplara açık.",prio:"B",status:"Aranmadı",nrw:false},
+{id:40,cat:"🍷 Wein-Depot & Şarap Evleri",name:"Ludwig Beck Wein",city:"München",addr:"Marienplatz 11, 80331 München",phone:"+49 89 23691-0",email:"info@ludwigbeck.de",contact:"Kategori Müdürü Şarap (sorulacak)",buying:"Şarap alımı: kategorie.wein@ludwigbeck.de",note:"Münih'in lüks mağazası. Urla & Porta Caeli şarap bölümü için ideal.",prio:"B",status:"Aranmadı",nrw:false},
+// 🏪 GROSSHANDEL & ONLINE
+{id:9,cat:"🏪 Grosshandel & Online",name:"Hawesko Holding SE",city:"Hamburg",addr:"Barmbeker Str. 25, 22303 Hamburg",phone:"+49 40 63671-0",email:"investor.relations@hawesko.de",contact:"CEO: Thorsten Hermelink; COO: Alexander Borwitzky",buying:"Yeni ürün alımı: einkauf@hawesko.de",note:"Almanya en büyük şarap evi — 639 Mio. € ciro. Jacques, Hawesko.de, WirWinzer, CWD dahil. Türk şarabı yok — büyük fırsat!",prio:"A",status:"Aranmadı",nrw:false},
+{id:11,cat:"🏪 Grosshandel & Online",name:"CWD Champagner- und Wein-Distributionsgesellschaft",city:"Hamburg",addr:"Barmbeker Str. 25, 22303 Hamburg",phone:"+49 40 63671-0",email:"info@cwd-wein.de",contact:"Hawesko Holding üzerinden",buying:"B2B alımı: Hamburg HQ",note:"Hawesko B2B kolu — gastronomi büyük alımları buradan. Doğrudan B2B ortaklık mümkün!",prio:"A",status:"Aranmadı",nrw:false},
+{id:12,cat:"🏪 Grosshandel & Online",name:"Wein Wolf Gruppe GmbH",city:"Mainz",addr:"Wilhelm-Theodor-Römheld-Str. 14, 55130 Mainz",phone:"+49 6131 9244-0",email:"info@wein-wolf.de",contact:"Hawesko Holding üzerinden",buying:"Mainz: info@wein-wolf.de",note:"Hawesko bünyesinde şarap toptancısı. Geniş gastronomi müşteri ağı.",prio:"B",status:"Aranmadı",nrw:false},
+{id:13,cat:"🏪 Grosshandel & Online",name:"Pinard de Picard GmbH",city:"Köln",addr:"Subbelrather Str. 30, 50823 Köln",phone:"+49 221 9523480",email:"info@pinard-de-picard.de",contact:"GF: Hans-Peter Weiß",buying:"İthalat: import@pinard-de-picard.de",note:"Köln/NRW merkezli şarap ithalatçısı. Türk şarabı yeni kategori olarak eklenebilir.",prio:"A",status:"Aranmadı",nrw:true},
+{id:16,cat:"🏪 Grosshandel & Online",name:"Hawesko.de Online Mağaza",city:"Hamburg",addr:"Barmbeker Str. 25, 22303 Hamburg",phone:"+49 40 63671-234",email:"info@hawesko.de",contact:"Hawesko Holding üzerinden",buying:"Yeni ürünler: einkauf@hawesko.de",note:"Almanya en büyük online şarap mağazası. 8.500+ ürün. Türk şarabı yok — kategori müdürüyle görüş.",prio:"A",status:"Aranmadı",nrw:false},
+{id:17,cat:"🏪 Grosshandel & Online",name:"Vicampo.de GmbH",city:"Mainz",addr:"Am Gonsenheimer Spieß 25, 55130 Mainz",phone:"+49 6131 6245-0",email:"info@vicampo.de",contact:"GF: Max Gärtner, Felix Gärtner, Christian Fricke",buying:"Yeni üreticiler: partner@vicampo.de",note:"Almanya 2. büyük online şarap mağazası. 4.000+ ürün. Türk kategorisi açılabilir.",prio:"A",status:"Aranmadı",nrw:false},
+{id:18,cat:"🏪 Grosshandel & Online",name:"Vinexus GmbH",city:"Saarbrücken",addr:"Am Homburg 2, 66123 Saarbrücken",phone:"+49 681 99 37 37 0",email:"info@vinexus.de",contact:"Viva eCom Group üzerinden",buying:"Yeni şaraplar: einkauf@vinexus.de",note:"Geniş ürün yelpazesi, güçlü lojistik. Türk şarabı yeni kategori olarak girilebilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:19,cat:"🏪 Grosshandel & Online",name:"WirWinzer GmbH",city:"Hamburg",addr:"Hamburg (Hawesko bünyesi)",phone:"",email:"info@wirwinzer.de",contact:"Hawesko Holding üzerinden",buying:"Yeni üreticiler: partner@wirwinzer.de",note:"Doğrudan üretici platformu. Kavaklidere, Urla gibi üreticiler platforma listelenebilir.",prio:"B",status:"Aranmadı",nrw:false},
+{id:20,cat:"🏪 Grosshandel & Online",name:"Die Weinbörse GmbH",city:"Köln",addr:"Köln, NRW",phone:"",email:"info@dieweinboerse.de",contact:"GF",buying:"Yeni üreticiler: einkauf@dieweinboerse.de",note:"Köln/NRW merkezli — yerinde ziyaret mümkün. Weinvorteil + De Wijnbeurs birleşimi. Geniş müşteri tabanı.",prio:"A",status:"Aranmadı",nrw:true},
+{id:21,cat:"🏪 Grosshandel & Online",name:"BELViNi GmbH",city:"Wörth am Rhein",addr:"Wörth am Rhein",phone:"+49 7271 9247-0",email:"info@belvini.de",contact:"GF",buying:"Yeni üreticiler: info@belvini.de",note:"Nadir üzüm çeşitleri uzmanı. Öküzgözü, Kalecik Karası gibi Türk yerli çeşitleri mükemmel uyum.",prio:"B",status:"Aranmadı",nrw:false},
+{id:25,cat:"🏪 Grosshandel & Online",name:"Schlüter Weine GmbH",city:"Köln",addr:"Köln",phone:"",email:"info@schlueter-weine.de",contact:"GF",buying:"Köln alım",note:"Köln merkezli şarap toptancısı. Gastronomi tedarikçisi. NRW'de güçlü.",prio:"A",status:"Aranmadı",nrw:true},
+{id:35,cat:"🏪 Grosshandel & Online",name:"Ludwig v. Kapff Merkez Hamburg",city:"Hamburg",addr:"Alter Wandrahm 1, 20457 Hamburg",phone:"+49 40 31180-0",email:"wein@kapff.de",contact:"Satın alma: Stefan Gröls",buying:"Yeni bölgeler: einkauf@kapff.de",note:"Almanya önemli şarap toptancılarından. Türk şarabı portföyde yok.",prio:"B",status:"Aranmadı",nrw:false}
+,
+// 🔔 UYANDIRILAAK MÜŞTERİLER — 6+ ay sipariş yok (fatura bazlı)
+{id:9100,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 MK Getränke",city:"Lüdenscheid",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.11.2025 (189 gün önce). Ciro: 22,266 €, 7 fatura.",prio:"A",status:"Aranmadı",nrw:true},
+{id:9101,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 S Cafe",city:"München",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 02.09.2025 (251 gün önce). Ciro: 21,302 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9102,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Macera Lounge",city:"Gelsenkirchen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.10.2025 (200 gün önce). Ciro: 15,620 €, 8 fatura.",prio:"A",status:"Aranmadı",nrw:true},
+{id:9103,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Alfa Pack & Food GmbH",city:"Weil am Rhein",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 25.09.2025 (228 gün önce). Ciro: 13,712 €, 4 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9104,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Aslan Import GmbH",city:"Braunschweig",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.03.2025 (423 gün önce). Ciro: 13,423 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9105,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Fifty Fifty  Gastronomie GmbH",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.10.2025 (200 gün önce). Ciro: 8,886 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9106,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Adana Gastro GmbH",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.07.2025 (292 gün önce). Ciro: 8,820 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9107,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Jiyan Handels GmbH",city:"Frankfurt am Main",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 06.10.2025 (217 gün önce). Ciro: 8,645 €, 6 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9108,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Asebo UG (Haftungsbeschränkt)",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.07.2025 (312 gün önce). Ciro: 8,050 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9109,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Großhandel Güdük GmbH & Co. KG",city:"Rostock",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 29.10.2025 (194 gün önce). Ciro: 7,895 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9110,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Morgenland Import – Export Gastr. GmbH",city:"Hannover",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.07.2025 (304 gün önce). Ciro: 6,935 €, 1 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9111,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Aladins Wunderlampe GmbH",city:"Neuss",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 28.06.2025 (317 gün önce). Ciro: 6,568 €, 9 fatura.",prio:"A",status:"Aranmadı",nrw:true},
+{id:9112,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Baro Steakhouse",city:"Wuppertal",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 16.09.2025 (237 gün önce). Ciro: 6,329 €, 3 fatura.",prio:"A",status:"Aranmadı",nrw:true},
+{id:9113,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Adana Grillhaus",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 29.09.2025 (224 gün önce). Ciro: 6,114 €, 1 fatura.",prio:"A",status:"Aranmadı",nrw:false},
+{id:9114,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ CC COOL FOOD GmbH",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 19.05.2025 (357 gün önce). Ciro: 5,179 €, 2 fatura.",prio:"A",status:"Aranmadı",nrw:true},
+{id:9115,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Baba Angora",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.07.2025 (294 gün önce). Ciro: 4,505 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9116,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Wickeder Getränkemarkt",city:"Dortmund",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 24.04.2025 (382 gün önce). Ciro: 4,462 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9117,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Ocakbasi Alstadt UG",city:"Dresden",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 07.10.2025 (216 gün önce). Ciro: 3,994 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9118,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ ILICA GmbH",city:"Köln",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 27.05.2025 (349 gün önce). Ciro: 3,865 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9119,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 EFORA",city:"Bielefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 08.10.2025 (215 gün önce). Ciro: 3,828 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9120,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ba Badiyel",city:"Erfurt",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.07.2025 (306 gün önce). Ciro: 3,739 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9121,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Vermaat Leisure B.V.",city:"IJsselstein",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 30.04.2025 (376 gün önce). Ciro: 3,236 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9122,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 The MEAT",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.10.2025 (200 gün önce). Ciro: 3,118 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9123,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Kuru",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.10.2025 (202 gün önce). Ciro: 2,979 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9124,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Yeni Adana Grillhaus",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.11.2025 (189 gün önce). Ciro: 2,940 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9125,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Kijji mediator",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.07.2025 (305 gün önce). Ciro: 2,865 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9126,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Moon Events&Catering",city:"Laatzen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.02.2025 (455 gün önce). Ciro: 2,705 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9127,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Moda GmbH",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 30.06.2025 (315 gün önce). Ciro: 2,603 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9128,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Osman30",city:"Köln",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.11.2025 (181 gün önce). Ciro: 2,551 €, 6 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9129,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Pera",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 16.07.2025 (299 gün önce). Ciro: 2,520 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9130,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Toms Restaurant",city:"Freiburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 13.01.2025 (483 gün önce). Ciro: 2,370 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9131,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Bilen Bau GmbH",city:"Erkelenz",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.07.2025 (301 gün önce). Ciro: 2,334 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9132,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ La Gastronomi &Getränkegrosshandel GmbH",city:"Troisdorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 19.02.2025 (446 gün önce). Ciro: 2,330 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9133,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Restaurantta Fantasia",city:"Offenbach",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.08.2025 (264 gün önce). Ciro: 2,215 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9134,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Karadag Süpermarket",city:"Recklinghausen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.06.2025 (334 gün önce). Ciro: 2,166 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9135,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Agirdogan",city:"Boppard",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 2,041 €, 8 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9136,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 The Classic Western Steakhouse",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.10.2025 (202 gün önce). Ciro: 1,868 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9137,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Balkan",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.08.2025 (269 gün önce). Ciro: 1,827 €, 4 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9138,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Pizzeria Fantasia 3 GmbH",city:"Offenbach",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.08.2025 (264 gün önce). Ciro: 1,719 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9139,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Turquoise Restaurant",city:"Aachen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.06.2025 (322 gün önce). Ciro: 1,680 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9140,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ahi Events Bottrop GmbH",city:"Bottrop",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.03.2025 (417 gün önce). Ciro: 1,633 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9141,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ali Erdogan",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 02.05.2025 (374 gün önce). Ciro: 1,585 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9142,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Restaurant Tablo",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.05.2025 (361 gün önce). Ciro: 1,578 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9143,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Menekse",city:"Offenburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 19.08.2025 (265 gün önce). Ciro: 1,564 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9144,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Laser Isse Europe GmbH",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.10.2025 (206 gün önce). Ciro: 1,515 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9145,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Lezzet Restaurant",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.03.2025 (423 gün önce). Ciro: 1,497 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9146,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Le Phenix",city:"Frankfurt am Main",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.04.2025 (397 gün önce). Ciro: 1,496 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9147,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Mosaik Restraurant",city:"Borken",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 26.08.2025 (258 gün önce). Ciro: 1,404 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9148,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Restaurant Esskultürk",city:"Wuppertal",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.10.2025 (214 gün önce). Ciro: 1,388 €, 5 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9149,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Marketim Gourmet",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 25.04.2025 (381 gün önce). Ciro: 1,385 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9150,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Winkels Getränke Logistik GmbH",city:"Sachsenheim",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.01.2025 (475 gün önce). Ciro: 1,362 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9151,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Loran Gastronomie und Management GmbH",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.10.2025 (214 gün önce). Ciro: 1,324 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9152,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Istanbul Restaurant Ocakbasi",city:"Hilden",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 28.06.2025 (317 gün önce). Ciro: 1,321 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9153,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Provinzial",city:"Mettmann",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 24.06.2025 (321 gün önce). Ciro: 1,296 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9154,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 A+A Glashütten Restaurant und Hotel GmbH",city:"Glashütten",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 01.10.2025 (222 gün önce). Ciro: 1,267 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9155,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Sultan Palace GmbH",city:"Hannover",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 24.09.2025 (229 gün önce). Ciro: 1,251 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9156,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Ismail Erdogan",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 27.10.2025 (196 gün önce). Ciro: 1,169 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9157,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Zadem Prive",city:"Köln",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 04.03.2025 (433 gün önce). Ciro: 1,124 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9158,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Aslan",city:"Gelsenkirchen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 22.07.2025 (293 gün önce). Ciro: 1,121 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9159,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Nihat Bozhuyuk",city:"Aachen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.10.2025 (206 gün önce). Ciro: 1,059 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9160,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Kanik",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 02.06.2025 (343 gün önce). Ciro: 1,058 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9161,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Kiosk am Frauenlob By Sen",city:"Mainz",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 26.06.2025 (319 gün önce). Ciro: 1,047 €, 3 fatura.",prio:"B",status:"Aranmadı",nrw:false},
+{id:9162,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Akbulut",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.05.2025 (361 gün önce). Ciro: 1,044 €, 2 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9163,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Samco Autotechnik GmbH",city:"Tönisvorst",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 1,022 €, 1 fatura.",prio:"B",status:"Aranmadı",nrw:true},
+{id:9164,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ 01 adana Sema Karasac",city:"Neuss",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.03.2025 (423 gün önce). Ciro: 998 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9165,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Burg Hotel",city:"Homberg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.05.2025 (361 gün önce). Ciro: 995 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9166,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Hep Alacati",city:"Mannheim",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.02.2025 (454 gün önce). Ciro: 985 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9167,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Golfschmiede gastronomische GmbH",city:"Niedernberg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 25.04.2025 (381 gün önce). Ciro: 984 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9168,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Ergun",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 951 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9169,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Kilinc",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.10.2025 (220 gün önce). Ciro: 904 €, 3 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9170,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Manolya Turkish Delight",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.05.2025 (361 gün önce). Ciro: 889 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9171,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Türkisches Generalkonsulat",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 16.10.2025 (207 gün önce). Ciro: 874 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9172,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Hümintech GmbH",city:"Grevenbroich",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 869 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9173,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Eski Usul Meyhane  by Anka Events",city:"Dortmund",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.10.2025 (214 gün önce). Ciro: 850 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9174,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 City Cafe 29",city:"Bergisch Gladbach",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 05.08.2025 (279 gün önce). Ciro: 839 €, 3 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9175,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Yayla GmbH",city:"Krefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.10.2025 (214 gün önce). Ciro: 836 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9176,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Blind Rabbit Coctailbar",city:"Hanau",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 06.11.2025 (186 gün önce). Ciro: 823 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9177,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Zeki Yildirim",city:"Trebur",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 25.03.2025 (412 gün önce). Ciro: 803 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9178,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Restaurant Bosporus",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 01.04.2025 (405 gün önce). Ciro: 701 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9179,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Ceyhan",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 07.08.2025 (277 gün önce). Ciro: 696 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9180,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Rewe",city:"Groß-Bieberau",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 13.01.2025 (483 gün önce). Ciro: 695 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9181,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Aka",city:"Schwelm",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.08.2025 (264 gün önce). Ciro: 683 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9182,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Gasthof zum Riesen GmbH",city:"Seligenstadt",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.06.2025 (328 gün önce). Ciro: 646 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9183,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Lujo – Restaurant & Seecafé am Baldeneysee",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.03.2025 (423 gün önce). Ciro: 639 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9184,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ La Mesa",city:"Mönchengladbach",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 23.06.2025 (322 gün önce). Ciro: 628 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9185,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Sommer",city:"Kempen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 02.09.2025 (251 gün önce). Ciro: 612 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9186,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Dreieck Gastro GmbH",city:"Würselen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 31.03.2025 (406 gün önce). Ciro: 605 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9187,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Grill Ecke",city:"Breisach",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.02.2025 (454 gün önce). Ciro: 560 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9188,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Fahrschule Zick Zack",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 30.06.2025 (315 gün önce). Ciro: 556 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9189,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Always Food GmbH",city:"Nagold",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.01.2025 (482 gün önce). Ciro: 548 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9190,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Dönmez",city:"Mülheim an der Ruhr",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 05.11.2025 (187 gün önce). Ciro: 544 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9191,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Aran GmbH",city:"Aachen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.03.2025 (427 gün önce). Ciro: 540 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9192,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Liva Restaurant UG",city:"Mülheim an der Ruhr",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.04.2025 (389 gün önce). Ciro: 539 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9193,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ REWE Sedat Tekin oHG",city:"Heusenstamm",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.01.2025 (476 gün önce). Ciro: 529 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9194,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ G-Dogan GmbH",city:"Köln",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 18.03.2025 (419 gün önce). Ciro: 516 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9195,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Veli Yildirim",city:"Aachen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 27.08.2025 (257 gün önce). Ciro: 468 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9196,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Uno Espresso GmbH",city:"Ratingen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.03.2025 (423 gün önce). Ciro: 453 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9197,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Optimal Eng. & Trade GmbH",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 04.03.2025 (433 gün önce). Ciro: 453 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9198,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Robiin Kilinc",city:"Tönisvorst",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 18.06.2025 (327 gün önce). Ciro: 448 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9199,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Multi Kult Store GmbH",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 22.04.2025 (384 gün önce). Ciro: 438 €, 3 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9200,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Yaman",city:"Castrop-Rauxel",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.05.2025 (367 gün önce). Ciro: 429 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9201,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Canbay",city:"Bochum",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 05.11.2025 (187 gün önce). Ciro: 388 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9202,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Tcahiki Dobrowski",city:"Niederkassel",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 07.07.2025 (308 gün önce). Ciro: 384 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9203,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Ristorante IL Capitano",city:"Rodgau",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.08.2025 (264 gün önce). Ciro: 381 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9204,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Y-Getränke",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.10.2025 (214 gün önce). Ciro: 355 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9205,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Demircapa",city:"Krefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 29.07.2025 (286 gün önce). Ciro: 335 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9206,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 AS-KA GmbH & Co. KG",city:"Tönisvorst",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 315 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9207,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Bulut",city:"Berlin",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 25.09.2025 (228 gün önce). Ciro: 306 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9208,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ethem Yilmaz",city:"Bochum",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 08.05.2025 (368 gün önce). Ciro: 305 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9209,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Eli’s Cafe",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 13.06.2025 (332 gün önce). Ciro: 298 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9210,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Anka Restaurant",city:"Dormagen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.06.2025 (328 gün önce). Ciro: 288 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9211,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Atabek",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 29.09.2025 (224 gün önce). Ciro: 285 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9212,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Onay",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.10.2025 (220 gün önce). Ciro: 284 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9213,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Mydent ZMVZ GmbH",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 282 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9214,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Travelplanet GmbH",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 08.04.2025 (398 gün önce). Ciro: 281 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9215,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Özbay",city:"Krefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 06.10.2025 (217 gün önce). Ciro: 281 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9216,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Le Man GmbH",city:"Wuppertal",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 16.09.2025 (237 gün önce). Ciro: 281 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9217,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Deniz Caliskan",city:"Krefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.08.2025 (263 gün önce). Ciro: 281 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9218,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ahmedov",city:"Duisburg",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 20.05.2025 (356 gün önce). Ciro: 259 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9219,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Fortuna Cafe",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 15.09.2025 (238 gün önce). Ciro: 259 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9220,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Dogan",city:"Willich",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 21.10.2025 (202 gün önce). Ciro: 253 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9221,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Albayrak",city:"Mülheim an der Ruhr",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 04.06.2025 (341 gün önce). Ciro: 248 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9222,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Ritali Werbung GmbH",city:"Krefeld",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 06.03.2025 (431 gün önce). Ciro: 241 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9223,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Mustafa Armagan Apak",city:"Kempen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.01.2025 (479 gün önce). Ciro: 226 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9224,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Handelsagentur Prümper",city:"Aachen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 27.08.2025 (257 gün önce). Ciro: 214 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9225,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Julia & Dieter Ahrweiler GbR",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 14.04.2025 (392 gün önce). Ciro: 204 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9226,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Yasar",city:"Ratingen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 01.10.2025 (222 gün önce). Ciro: 172 €, 2 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9227,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Güven",city:"Ennepetal",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 06.01.2025 (490 gün önce). Ciro: 161 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9228,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Veysel Dogan",city:"Willich",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.02.2025 (448 gün önce). Ciro: 161 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9229,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Kolcak",city:"Velbert",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 29.07.2025 (286 gün önce). Ciro: 157 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9230,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Alkan",city:"Essen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 18.06.2025 (327 gün önce). Ciro: 157 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9231,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Steuerbüro Andreas Litzke",city:"Solingen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 10.11.2025 (182 gün önce). Ciro: 148 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9232,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Hexe Bolker4",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 27.08.2025 (257 gün önce). Ciro: 148 €, 3 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9233,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Yilba GmbH",city:"Neuss",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 19.02.2025 (446 gün önce). Ciro: 143 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9234,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Novamak GmbH",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.10.2025 (220 gün önce). Ciro: 141 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9235,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Kuyucu",city:"Elmenhorst/Lichtenhagen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 24.06.2025 (321 gün önce). Ciro: 132 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9236,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Kaan Ayaydin",city:"Solingen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 11.09.2025 (242 gün önce). Ciro: 131 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9237,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Cetinkaya",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 02.10.2025 (221 gün önce). Ciro: 112 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9238,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Sara Bengi Günal",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 09.07.2025 (306 gün önce). Ciro: 112 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9239,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ S-Dogan GmbH & Co. KG",city:"Köln",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 12.05.2025 (364 gün önce). Ciro: 92 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9240,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Anadolu e.V.",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 17.09.2025 (236 gün önce). Ciro: 80 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9241,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Murat Coskun",city:"Niederkassel",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 07.07.2025 (308 gün önce). Ciro: 72 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:false},
+{id:9242,cat:"🔔 Uyandırılacak Müşteriler",name:"⚠️ Cengiz",city:"Gelsenkirchen",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 12.03.2025 (425 gün önce). Ciro: 71 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+{id:9243,cat:"🔔 Uyandırılacak Müşteriler",name:"🔔 Danacioglu",city:"Düsseldorf",addr:"",phone:"",email:"",contact:"",buying:"Yeniden aktive et",note:"Son sipariş: 03.10.2025 (220 gün önce). Ciro: 50 €, 1 fatura.",prio:"C",status:"Aranmadı",nrw:true},
+// 🇳🇱 AMSTERDAM
+{id:8001,cat:"🍽 Restoranlar",name:"Levant Restaurant",city:"Amsterdam",addr:"Weteringschans 93, 1017 RZ Amsterdam",phone:"+31 20 622 5184",email:"reserveren@restaurantlevant.nl",contact:"İşletmeci",buying:"E-posta veya telefon",note:"Amsterdam en iyi Türk restoranları listesinde üst sırada. Şarap & rakı servisi aktif. Otantik Türk mutfağı.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8002,cat:"🍽 Restoranlar",name:"Maydanoz Restaurant",city:"Amsterdam",addr:"Ceintuurbaan 9, 1072 GA Amsterdam (De Pijp)",phone:"+31 20 676 1195",email:"",contact:"İşletmeci",buying:"Telefon veya yerinde",note:"Amsterdam De Pijp mahallesinde Türk-Akdeniz mutfağı. Izgara et, mezze, şarap odaklı. Yüksek değerlendirme.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8003,cat:"🍽 Restoranlar",name:"Orontes De Pijp",city:"Amsterdam",addr:"Albert Cuypstraat 40/42, 1072 CV Amsterdam",phone:"+31 20 679 6225",email:"",contact:"İşletmeci",buying:"Telefon",note:"Amsterdam De Pijp. Antakya mutfağı, mezze odaklı. Türkiye'den özel malzeme ithalatı. İki şubeli zincir.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8004,cat:"🍽 Restoranlar",name:"Orontes West",city:"Amsterdam",addr:"Hugo de Grootplein 8, 1052 LJ Amsterdam",phone:"",email:"",contact:"İşletmeci",buying:"restaurantoronteswest.nl",note:"Jordaan yakını, Amsterdam Batı. Aynı zincirin 2. şubesi. Mezze-grill odaklı, şarap listesi aktif.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8005,cat:"🍽 Restoranlar",name:"Ali Ocakbaşı Amsterdam",city:"Amsterdam",addr:"Herengracht 558, 1017 CB Amsterdam (Centrum)",phone:"+31 627 522 070",email:"",contact:"Abbas Bey (Servis Müdürü)",buying:"aliocakbasi.nl veya telefon",note:"Amsterdam'ın en prestijli Türk restoranı. Tripadvisor #26. Anatolian ocakbaşı kültürü. Mezze & şarap için prime hedef.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8006,cat:"🍽 Restoranlar",name:"Lokanta Evden Uzakta",city:"Amsterdam",addr:"Amsterdam Centrum",phone:"",email:"hello@lokantaeu.nl",contact:"İşletmeci",buying:"hello@lokantaeu.nl",note:"'İstanbul meyhane kültürü Amsterdam da.' Fasıl, rakı, meze. 10+ kişi için rezervasyon e-posta ile. Tam hedef profili.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8007,cat:"🍽 Restoranlar",name:"Tike Meyhane (Yeni Nesil Meyhane)",city:"Amsterdam",addr:"Amsterdam",phone:"",email:"",contact:"İşletmeci",buying:"Instagram: @tikeamsterdam",note:"'Her gün eğlence, fasıl geceleri.' Aktif meyhane kültürü Amsterdam. Rakı & şarap tedarikçisi için ideal.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8008,cat:"🍽 Restoranlar",name:"Meyhane Matiz",city:"Amsterdam",addr:"Frederiksplein 29, 1017 XL Amsterdam",phone:"+31 20 638 3529",email:"",contact:"İşletmeci",buying:"Telefon: +31 20 638 3529",note:"Amsterdam Frederiksplein'de meyhane. Telefon doğrulandı. Rakı & şarap servisi.",prio:"A",status:"Aranmadı",nrw:false},
+{id:8009,cat:"🍽 Restoranlar",name:"Restaurant Divan Amsterdam",city:"Amsterdam",addr:"Elandsgracht 14, 1016 TV Amsterdam (Jordaan)",phone:"",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Jordaan'da Türk restoranı. Arkadaşça atmosfer, otantik mutfak. İyi şarap listesi potansiyeli.",prio:"B",status:"Aranmadı",nrw:false},
+{id:8010,cat:"🍽 Restoranlar",name:"Papatya Turks Restaurant",city:"Amsterdam",addr:"Buiten Brouwersstraat 19, 1013 GJ Amsterdam",phone:"+31 20 622 0865",email:"",contact:"İşletmeci",buying:"Telefon: +31 20 622 0865",note:"Amsterdam Centrum'da Türk restoranı. Telefon doğrulandı.",prio:"B",status:"Aranmadı",nrw:false},
+{id:8011,cat:"🍽 Restoranlar",name:"Maz Mez (Lübnanlı)",city:"Amsterdam",addr:"Jan Evertsenstraat 17-19, Amsterdam West",phone:"+31 20 737 1...",email:"",contact:"İşletmeci",buying:"Yerinde ziyaret",note:"Lübnanlı restoran Amsterdam Batı. Şarap & meze odaklı. Türk şarabı Doğu Akdeniz çeşidi olarak sun.",prio:"B",status:"Aranmadı",nrw:false},
+{id:8012,cat:"🍽 Restoranlar",name:"Iqram Restaurant",city:"Amsterdam",addr:"Tussen Meer 213, Amsterdam Nieuw-West",phone:"+31 20 246 6662",email:"",contact:"İşletmeci",buying:"Telefon: +31 20 246 6662 / iqram.nl",note:"Yeni açılan lüks Türk restoranı. Instagram'da aktif. Geniş iç mekan. Şarap menüsü geliştirme potansiyeli.",prio:"B",status:"Aranmadı",nrw:false}
+
+];
+
+// ====== TYPE DETECTION ======
+function detectType(name){
+  const n=name.toLowerCase();
+  if(/restaurant|rest\.|gastro|kebab|sofra|meyhane|lounge|caf[eé]|bistro|meze|steak|fisch|grill|dining|kantine|ocakbasi|adana|döner|divan|zeitlos|trüffel|mare|fasil|savarona|sultan|nasip|pirzola|pera|bosporus|kuyu|sumack|alaturka|shiraz|esskultürk|anka event|foodkult|bigchef|theaterbar|taverna|tokotis|tile|lokanta|bar\b|doppelherz|saki|melo|yakamoz|balkan/.test(n)) return 'R';
+  if(/trinkhalle|getränke|kiosk|abholmarkt|minimarkt|depot|wein.depot|wein werk|wein.handel|wein.gmbh|feinkost|grosshandel|großhandel|handel\b|import|export|spirits|drinks|lebensmittel|food\b|market|markt\b|supermarkt/.test(n)) return 'G';
+  if(/hotel/.test(n)) return 'H';
+  return 'D';
+}
+const TC={R:{l:'Restoran',bg:'#e1f5ee',c:'#0f6e56'},G:{l:'Getränke',bg:'#e6f1fb',c:'#185fa5'},H:{l:'Hotel',bg:'#faeeda',c:'#854f0b'},D:{l:'Diğer',bg:'#f1efe8',c:'#5f5e5a'}};
+
+const CUSTOMERS = CRAW.map(([id,name,city,plz,phone])=>({id,name,city,plz,phone,type:detectType(name),orders:[]}));
+const allCities=['Tümü',...[...new Set(CUSTOMERS.map(c=>c.city))].sort()];
+
+// ====== ROUTES ======
+
+const ALL_CITIES = [
+  // NRW
+  'Düsseldorf','Essen','Krefeld','Duisburg','Köln','Aachen','Neuss','Wuppertal',
+  'Dortmund','Mülheim an der Ruhr','Gelsenkirchen','Mönchengladbach','Bochum',
+  'Bielefeld','Herne','Solingen','Leverkusen','Oberhausen','Recklinghausen',
+  'Bottrop','Bergisch Gladbach','Ratingen','Meerbusch','Grevenbroich','Hilden',
+  'Langenfeld','Remscheid','Velbert','Tönisvorst','Willich','Kempen',
+  'Mettmann','Dormagen','Monheim Am Rhein','Würselen','Herzogenrath',
+  // Almanya diğer büyük şehirler
+  'Berlin','Hamburg','München','Frankfurt am Main','Stuttgart','Leipzig',
+  'Hannover','Nürnberg','Bremen','Dresden','Bonn','Münster','Mannheim',
+  'Freiburg','Mainz','Koblenz','Saarbrücken','Offenbach','Aschaffenburg',
+  'Hanau','Braunschweig','Rostock','Erfurt','Augsburg','Wiesbaden',
+  'Offenburg','Kehl','Seligenstadt','Heidelberg','Karlsruhe','Ulm',
+  'Ingolstadt','Regensburg','Würzburg','Darmstadt','Lübeck','Kiel',
+  'Halle','Magdeburg','Erfurt','Jena','Cottbus','Potsdam',
+  'Göttingen','Kassel','Paderborn','Siegen','Gießen','Marburg',
+  'Heilbronn','Pforzheim','Reutlingen','Konstanz','Freiburg',
+  'Lüdenscheid','Hagen','Schwelm','Ennepetal','Gevelsberg',
+  'Kaufungen','Butzbach','Ibbenbüren','Gronau','Rheinbach',
+  'Ahlen','Castrop-Rauxel','Boppard','Troisdorf','Niederkassel',
+  'Niedernberg','Grafschaft','Borken','Rheinbach',
+  // Hollanda
+  'Amsterdam','Rotterdam','Den Haag','Utrecht','Eindhoven',
+  'Tilburg','Groningen','Almere','Breda','Nijmegen',
+  'Arnhem','Enschede','Apeldoorn','Haarlem','Amersfoort',
+  'Zaanstad','s-Hertogenbosch','Maastricht','Leiden','Dordrecht',
+];
+const ROUTES={
+  Pazartesi:{cities:['Düsseldorf','Ratingen','Meerbusch','Grevenbroich'],color:'#534AB7',bg:'#EEEDFE'},
+  Salı:{cities:['Köln','Neuss','Aachen','Bergisch Gladbach','Niederkassel','Hürth'],color:'#185FA5',bg:'#E6F1FB'},
+  Çarşamba:{cities:['Essen','Duisburg','Mülheim an der Ruhr','Gelsenkirchen','Bochum','Oberhausen'],color:'#854F0B',bg:'#FAEEDA'},
+  Perşembe:{cities:['Krefeld','Mönchengladbach','Wuppertal','Solingen','Dortmund','Herne'],color:'#3B6D11',bg:'#EAF3DE'},
+};
+
+// ====== STATE ======
+let state={tab:'dashboard',cityFilter:'Tümü',search:'',selected:null,showVisitForm:false,vForm:{note:'',result:'Sipariş Alındı'},prodTab:'raki',routeDay:'Pazartesi',routeConfig:{Pazartesi:{cities:[],extra:[]},Salı:{cities:[],extra:[]},Çarşamba:{cities:[],extra:[]},Perşembe:{cities:[],extra:[]}},citySearchStr:'',potCat:'Tümü',potSearch:'',potPrio:'Tümü',visits:{},nextVid:1,showAddForm:false,potView:'targets'};
+let manualPotentials=[];
+let nextManualId=9000;
+
+function setTab(t){
+  state.tab=t;state.selected=null;state.showVisitForm=false;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nb-'+t);
+  if(nb)nb.classList.add('active');
+  render();
+}
+
+function render(){
+  const el=document.getElementById('content');
+  document.getElementById('hdr-sub').textContent=`${CUSTOMERS.length} müşteri · v2.0`;
+  if(state.tab==='dashboard') renderDashboard(el);
+  else if(state.tab==='customers') state.selected?renderDetail(el):renderCustomers(el);
+  else if(state.tab==='routes') renderRoutes(el);
+  else if(state.tab==='products') renderProducts(el);
+  else if(state.tab==='potentials') renderPotentials(el);
+}
+
+// ---- DASHBOARD ----
+
+function buildTop10(){
+  var rows=Object.entries(OD).sort(function(a,b){return b[1].c-a[1].c;}).slice(0,10);
+  var html='<div class="section-label">🏆 Top 10 Müşteri (Ciro)</div><div style="padding:0 16px">';
+  rows.forEach(function(entry){
+    var id=entry[0]; var o=entry[1];
+    var cust=CUSTOMERS.find(function(c){return c.id==id;});
+    var name=cust?cust.name:id;
+    var city=cust?cust.city:'';
+    var col=o.g>120?'#e24b4a':o.g>60?'#ba7517':'#3b6d11';
+    html+='<div class="card card-tap" onclick="openCustomer('+id+')" style="padding:10px 14px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>';
+    html+='<div style="font-size:11px;color:#888">'+city+' &middot; '+o.s+' sipariş &middot; ort '+o.a+'g</div>';
+    html+='</div>';
+    html+='<div style="text-align:right;flex-shrink:0;margin-left:10px">';
+    html+='<div style="font-size:14px;font-weight:700;color:#6B2D3E">'+o.c.toLocaleString()+' €</div>';
+    html+='<div style="font-size:10px;color:'+col+'">'+o.d+'</div>';
+    html+='</div></div></div>';
+  });
+  html+='</div>';
+  return html;
+}
+
+function renderDashboard(el){
+  const days=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const todayName=days[new Date().getDay()];
+  const todayRoute=ROUTES[todayName];
+  const totalV=Object.values(state.visits).reduce((s,a)=>s+a.length,0);
+  const nrwCities=new Set(Object.values(ROUTES).flatMap(r=>r.cities));
+  const nrwCount=CUSTOMERS.filter(c=>nrwCities.has(c.city)).length;
+  const recentV=Object.entries(state.visits).flatMap(([cid,logs])=>logs.map(v=>({...v,cust:CUSTOMERS.find(c=>c.id==cid)}))).slice(-4).reverse();
+  el.innerHTML=`
+<div style="background:#fff;padding:16px 16px 12px;border-bottom:1px solid #e8e6df">
+  <div style="font-size:12px;color:#999;margin-bottom:3px">${new Date().toLocaleDateString('de-DE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+  <div style="font-size:20px;font-weight:600">Merhaba Bertan! 👋</div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-label">Toplam Müşteri</div><div class="stat-val">${CUSTOMERS.length}</div><div class="stat-sub">714 Almanya kayıtlı</div></div>
+  <div class="stat"><div class="stat-label">NRW Müşteri</div><div class="stat-val">${nrwCount}</div><div class="stat-sub">öncelikli bölge</div></div>
+  <div class="stat"><div class="stat-label">Aktif Müşteri</div><div class="stat-val">${Object.keys(OD).filter(id=>OD[id].g<=90).length}</div><div class="stat-sub">son 90 günde sipariş</div></div>
+  <div class="stat"><div class="stat-label">Toplam Ciro</div><div class="stat-val">${(Object.values(OD).reduce((s,o)=>s+o.c,0)/1000).toFixed(0)}K €</div><div class="stat-sub">2025–2026</div></div>
+</div>
+${todayRoute?`
+<div class="section-label">Bugünün Rotası — ${todayName}</div>
+<div style="padding:0 16px">
+  <div style="background:${todayRoute.bg};border-radius:12px;padding:14px;border:1px solid ${todayRoute.color}30">
+    <div style="font-size:13px;font-weight:600;color:${todayRoute.color};margin-bottom:4px">${todayRoute.cities.join(' → ')}</div>
+    <div style="font-size:12px;color:#888">${CUSTOMERS.filter(c=>todayRoute.cities.includes(c.city)).length} müşteri bu bölgede</div>
+  </div>
+</div>`:''}
+${buildTop10()}
+<div class="section-label">Son Ziyaret Notları</div>
+<div style="padding:0 16px">
+${recentV.length?recentV.map(v=>`<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div><div style="font-size:13px;font-weight:600">${v.cust?.name||'?'}</div>
+    <div style="font-size:12px;color:#888;margin-top:2px">${v.cust?.city||''}</div>
+    ${v.note?`<div style="font-size:12px;color:#bbb;margin-top:4px">${v.note}</div>`:''}
+    </div>
+    <div style="text-align:right;flex-shrink:0;margin-left:8px">
+      <span class="badge r-${v.result.split(' ')[0]}" style="font-size:11px;padding:2px 8px;border-radius:12px">${v.result}</span>
+      <div style="font-size:11px;color:#bbb;margin-top:4px">${v.date}</div>
+    </div>
+  </div>
+</div>`).join(''):`<div class="empty">Henüz ziyaret kaydı yok.<br>Müşteriler sekmesinden ekle.</div>`}
+</div>
+<div class="section-label">Satış Stratejisi</div>
+<div style="padding:0 16px 20px">
+  <div class="strategy">
+    ${['🥩 Steakhaus zincirleri — Block House, The ASH, Maredo (NRW dahil)','🍷 Büyük Weinhandel — Jacques Depot (HQ Düsseldorf!), CWD, Hawesko','🌐 Online-Weinhandel — Vicampo, Hawesko.de, Weinbörse (Köln!)','🌍 Akdeniz mutfağı — Yunan, İtalyan, Lübnan restoranlar','🇹🇷 Yeni Türk restoranlar — haftalık Google Maps tarama'].map(t=>`<div style="font-size:12px;color:#555;padding:3px 0">${t}</div>`).join('')}
+  </div>
+</div>`;
+}
+
+// ---- CUSTOMERS ----
+function renderCustomers(el){
+  const filtered=CUSTOMERS.filter(c=>{
+    const cok=state.cityFilter==='Tümü'||c.city===state.cityFilter;
+    const sr=state.search.toLowerCase();
+    const sok=!sr||c.name.toLowerCase().includes(sr)||c.city.toLowerCase().includes(sr)||c.plz.includes(sr)||String(c.id).includes(sr);
+    return cok&&sok;
+  });
+  el.innerHTML=`
+<div class="search-bar">
+  <input type="text" placeholder="Müşteri, şehir, PLZ veya No ara…" value="${state.search}" oninput="state.search=this.value;renderCustomers(document.getElementById('content'))">
+</div>
+<div class="pills">${allCities.slice(0,30).map(c=>`<button class="pill${state.cityFilter===c?' on':''}" onclick="state.cityFilter='${c}';state.search='';render()">${c}${state.cityFilter===c&&c!=='Tümü'?` (${filtered.length})`:''}</button>`).join('')}</div>
+<div style="padding:8px 16px;font-size:12px;color:#999">${filtered.length} müşteri gösteriliyor</div>
+<div style="padding:0 16px">
+${filtered.map(c=>{
+  const vc=(state.visits[c.id]||[]).length;
+  return `<div class="card card-tap" onclick="openCustomer(${c.id})">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="flex:1;min-width:0;margin-right:10px">
+      <div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+      <div style="font-size:12px;color:#888;margin-top:2px">${c.city} · ${c.plz}</div>
+      ${c.phone?`<div style="font-size:11px;color:#bbb;margin-top:1px">${c.phone}</div>`:''}
+      ${OD[c.id]?`<div style="font-size:11px;color:#6B2D3E;margin-top:2px;font-weight:500">${OD[c.id].c.toLocaleString()} € · ${OD[c.id].s} sipariş</div>`:''}
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <span class="badge" style="background:${TC[c.type].bg};color:${TC[c.type].c}">${TC[c.type].l}</span>
+      ${OD[c.id]?`<span style="font-size:10px;color:${OD[c.id].g>120?'#e24b4a':OD[c.id].g>60?'#ba7517':'#3B6D11'}">${OD[c.id].d}</span>`:''}
+      ${vc?`<span style="font-size:11px;color:#3B6D11">✓ ${vc} ziyaret</span>`:''}
+    </div>
+  </div>
+</div>`;}).join('')}
+</div>`;
+}
+
+function openCustomer(id){
+  state.selected=CUSTOMERS.find(c=>c.id===id);
+  state.showVisitForm=false;
+  state.tab='customers';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nb-customers').classList.add('active');
+  render();
+}
+
+function renderDetail(el){
+  const c=state.selected;
+  const cvs=state.visits[c.id]||[];
+  el.innerHTML=`
+<div style="background:#fff;border-bottom:1px solid #e8e6df;padding:12px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:5">
+  <button class="back-btn" onclick="state.selected=null;render()">←</button>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+    <div style="font-size:12px;color:#888">${c.city}</div>
+  </div>
+  <span class="badge" style="background:${TC[c.type].bg};color:${TC[c.type].c};flex-shrink:0">${TC[c.type].l}</span>
+</div>
+<div style="padding:16px">
+  <div class="card">
+    ${[['Müşteri No','#'+c.id],['Şehir',c.city],['PLZ',c.plz],c.phone?['Telefon',c.phone]:null].filter(Boolean).map(([k,v])=>`
+    <div class="contact-row"><span class="contact-key">${k}</span><span class="contact-val">${v}</span></div>`).join('')}
+  </div>
+  ${OD[c.id]?`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+    <div class="stat" style="padding:10px">
+      <div class="stat-label">Toplam Ciro</div>
+      <div style="font-size:20px;font-weight:700;color:#6B2D3E;margin:4px 0">${OD[c.id].c.toLocaleString()} €</div>
+    </div>
+    <div class="stat" style="padding:10px">
+      <div class="stat-label">Sipariş Sayısı</div>
+      <div style="font-size:20px;font-weight:700;color:#6B2D3E;margin:4px 0">${OD[c.id].s}</div>
+    </div>
+    <div class="stat" style="padding:10px">
+      <div class="stat-label">Son Sipariş</div>
+      <div style="font-size:14px;font-weight:600;margin:4px 0;color:${OD[c.id].g>120?'#e24b4a':OD[c.id].g>60?'#ba7517':'#3b6d11'}">${OD[c.id].d}</div>
+      <div style="font-size:11px;color:#bbb">${OD[c.id].g} gün önce</div>
+    </div>
+    <div class="stat" style="padding:10px">
+      <div class="stat-label">Ort. Sipariş Aralığı</div>
+      <div style="font-size:14px;font-weight:600;margin:4px 0">${OD[c.id].a} gün</div>
+    </div>
+  </div>`:`
+  <div class="card" style="background:#f8f7f4;border-style:dashed;text-align:center;padding:14px">
+    <div style="font-size:12px;color:#bbb">Sipariş verisi bulunamadı</div>
+  </div>`}
+  <div style="font-size:13px;font-weight:600;margin:16px 0 8px">Ziyaret Günlüğü (${cvs.length})</div>
+  ${cvs.map((v,i)=>`<div class="card" style="border-left:3px solid #5DCAA5">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600" class="r-${v.result.split(' ')[0]}">${v.result}</span>
+      <span style="font-size:11px;color:#bbb">${v.date}</span>
+    </div>
+    ${v.note?`<div style="font-size:12px;color:#888;margin-top:6px">${v.note}</div>`:''}
+  </div>`).join('')}
+  ${state.showVisitForm?`
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">Ziyaret Ekle</div>
+    <div class="form-row"><label class="form-label">Sonuç</label>
+    <select id="vres"><option>Sipariş Alındı</option><option>Takip Edilecek</option><option>İlgilenmedi</option><option>Yoktu</option></select></div>
+    <div class="form-row"><label class="form-label">Not</label>
+    <textarea id="vnote" rows="3" placeholder="Görüşme notu…"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-save" onclick="saveVisit(${c.id})">Kaydet</button>
+      <button class="btn-ghost" onclick="state.showVisitForm=false;render()">İptal</button>
+    </div>
+  </div>`:`<button class="btn-add" onclick="state.showVisitForm=true;render()">+ Ziyaret Ekle</button>`}
+</div>`;
+}
+
+function saveVisit(id){
+  const result=document.getElementById('vres').value;
+  const note=document.getElementById('vnote').value.trim();
+  const date=new Date().toLocaleDateString('de-DE');
+  if(!state.visits[id])state.visits[id]=[];
+  state.visits[id].push({date,result,note,id:state.nextVid++});
+  state.showVisitForm=false;
+  render();
+}
+
+// ---- ROUTES ----
+function renderRoutes(el){
+  const rd = state.routeDay;
+  const cfg = state.routeConfig[rd];
+  const selCities = cfg.cities;
+  const selCustomers = cfg.selCustomers || {};  // {custId: true/false}
+  const selPotentials = cfg.selPotentials || {}; // {potId: true/false}
+  const srch = state.citySearchStr.toLowerCase();
+  const filtCities = ALL_CITIES.filter(c => !selCities.includes(c) && (!srch || c.toLowerCase().includes(srch)));
+
+  const routeCustomers = CUSTOMERS.filter(c => selCities.includes(c.city));
+  const allPots = [...POTENTIALS, ...manualPotentials];
+  const routePotentials = allPots.filter(p => selCities.includes(p.city) && p.cat !== '🔔 Uyandırılacak Müşteriler');
+
+  const selCustCount = routeCustomers.filter(c => selCustomers[c.id] !== false).length;
+  const selPotCount = routePotentials.filter(p => selPotentials[p.id] !== false).length;
+
+  el.innerHTML = `
+<div class="day-tabs">
+  ${['Pazartesi','Salı','Çarşamba','Perşembe'].map(d =>
+    `<button class="day-tab${state.routeDay===d?' on':''}" onclick="state.routeDay='${d}';state.citySearchStr='';renderRoutes(document.getElementById('content'))"
+    style="${state.routeDay===d?'background:#EEEDFE;color:#534AB7;border-color:#534AB750':''}">${d}</button>`
+  ).join('')}
+</div>
+
+<!-- Şehir arama -->
+<div style="background:#fff;border-bottom:1px solid #e8e6df;padding:10px 16px">
+  <div style="font-size:11px;color:#999;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Şehir Ekle</div>
+  <input type="text" id="city-srch" placeholder="Şehir ara... (Amsterdam, Köln, Berlin...)"
+    value="${state.citySearchStr}"
+    oninput="state.citySearchStr=this.value;renderRoutes(document.getElementById('content'))">
+  ${state.citySearchStr ? `
+  <div style="border:1px solid #e8e6df;border-radius:8px;margin-top:6px;max-height:150px;overflow-y:auto;background:#fff">
+    ${filtCities.slice(0,12).map(c =>
+      `<div onclick="addRouteCity('${rd}','${c}')"
+        style="padding:9px 14px;font-size:13px;cursor:pointer;border-bottom:0.5px solid #f0ede8"
+        onmouseover="this.style.background='#f8f7f4'" onmouseout="this.style.background=''">${c}</div>`
+    ).join('')}
+    ${filtCities.length === 0 ? '<div style="padding:10px 14px;font-size:12px;color:#bbb">Bulunamadı</div>' : ''}
+  </div>` : ''}
+</div>
+
+<!-- Seçili şehirler -->
+${selCities.length ? `
+<div style="padding:8px 16px;background:#fff;border-bottom:1px solid #e8e6df;display:flex;flex-wrap:wrap;gap:6px">
+  ${selCities.map(c =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;background:#6B2D3E;color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500">
+      ${c}
+      <span onclick="removeRouteCity('${rd}','${c}')" style="cursor:pointer;font-size:15px;line-height:1;opacity:.8">×</span>
+    </span>`
+  ).join('')}
+</div>
+
+<!-- Özet + Mail butonu -->
+<div style="padding:8px 16px;background:#f8f7f4;border-bottom:1px solid #e8e6df;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:12px;color:#888">
+    ${selCustCount} müşteri · ${selPotCount} hedef seçili
+  </div>
+  <button onclick="sendRouteMail('${rd}')"
+    style="background:#6B2D3E;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer">
+    ✉️ Mail Gönder
+  </button>
+</div>
+
+<!-- Müşteriler -->
+${routeCustomers.length ? `
+<div style="padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.06em">Müşteriler (${routeCustomers.length})</div>
+  <div style="display:flex;gap:8px">
+    <span onclick="selectAllCustomers('${rd}')" style="font-size:11px;color:#6B2D3E;cursor:pointer;font-weight:500">Tümünü Seç</span>
+    <span style="color:#ddd">|</span>
+    <span onclick="deselectAllCustomers('${rd}')" style="font-size:11px;color:#888;cursor:pointer">Temizle</span>
+  </div>
+</div>
+<div style="padding:0 16px">
+${routeCustomers.map(c => {
+  const od = OD[c.id];
+  const checked = selCustomers[c.id] !== false;
+  return `<div class="card" style="padding:10px 12px;display:flex;align-items:flex-start;gap:10px">
+    <input type="checkbox" ${checked?'checked':''} onchange="toggleCust('${rd}',${c.id},this.checked)"
+      style="margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:#6B2D3E">
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="toggleCust('${rd}',${c.id},${!checked})">
+      <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+      <div style="font-size:12px;color:#888">${c.city}${c.plz?' · '+c.plz:''}</div>
+      ${c.phone?`<div style="font-size:11px;color:#bbb">${c.phone}</div>`:''}
+      ${od?`<div style="font-size:11px;color:#6B2D3E;font-weight:500;margin-top:2px">${od.c.toLocaleString()} € · ${od.s} sipariş · <span style="color:${od.g>120?'#e24b4a':od.g>60?'#ba7517':'#3b6d11'}">${od.d}</span></div>`:''}
+      ${(state.visits[c.id]||[]).length?`<div style="font-size:11px;color:#3b6d11">✓ ${state.visits[c.id].length} ziyaret notu</div>`:''}
+    </div>
+  </div>`;
+}).join('')}
+</div>` : ''}
+
+<!-- Potansiyel Hedefler -->
+${routePotentials.length ? `
+<div style="padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.06em">🎯 Potansiyel Hedefler (${routePotentials.length})</div>
+  <div style="display:flex;gap:8px">
+    <span onclick="selectAllPots('${rd}')" style="font-size:11px;color:#6B2D3E;cursor:pointer;font-weight:500">Tümünü Seç</span>
+    <span style="color:#ddd">|</span>
+    <span onclick="deselectAllPots('${rd}')" style="font-size:11px;color:#888;cursor:pointer">Temizle</span>
+  </div>
+</div>
+<div style="padding:0 16px">
+${routePotentials.map(p => {
+  const checked = selPotentials[p.id] !== false;
+  return `<div class="card prio-${p.prio.toLowerCase()}" style="display:flex;align-items:flex-start;gap:10px">
+    <input type="checkbox" ${checked?'checked':''} onchange="togglePot('${rd}',${p.id},this.checked)"
+      style="margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:#6B2D3E">
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="togglePot('${rd}',${p.id},${!checked})">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+        <span style="font-size:13px;font-weight:700">${p.name}</span>
+        <span class="badge badge-${p.prio.toLowerCase()}">${p.prio}</span>
+      </div>
+      ${p.addr?`<div style="font-size:12px;color:#888;margin-top:2px">📍 ${p.addr}</div>`:''}
+      ${p.phone?`<div style="font-size:12px;color:#888">📞 <a href="tel:${p.phone}" style="color:#6B2D3E">${p.phone}</a></div>`:''}
+      ${p.email?`<div style="font-size:12px;color:#888">✉️ <a href="mailto:${p.email}" style="color:#6B2D3E">${p.email}</a></div>`:''}
+      ${p.contact?`<div style="font-size:11px;color:#aaa">${p.contact}</div>`:''}
+      <div style="font-size:11px;color:#bbb;font-style:italic">${p.cat}</div>
+    </div>
+  </div>`;
+}).join('')}
+</div>` : ''}
+
+<!-- Ekstra not -->
+<div style="padding:16px">
+  <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:6px">+ Ekstra Not Ekle</div>
+  <div style="display:flex;gap:8px">
+    <input type="text" id="extra-inp" placeholder="Not veya ekstra müşteri..." style="flex:1">
+    <button onclick="addExtraCustomer('${rd}')" style="padding:8px 14px;background:#6B2D3E;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0">Ekle</button>
+  </div>
+  ${cfg.extra && cfg.extra.length ? `<div style="margin-top:8px">${cfg.extra.map((e,i) =>
+    `<div class="card" style="padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center">
+      <span>${e}</span>
+      <span onclick="removeExtra('${rd}',${i})" style="cursor:pointer;color:#e24b4a;font-size:16px">×</span>
+    </div>`
+  ).join('')}</div>` : ''}
+</div>
+
+` : `
+<div class="empty" style="padding:48px 20px;text-align:center">
+  <div style="font-size:36px">🗓</div>
+  <div style="font-size:14px;font-weight:600;margin-top:10px">${rd} için şehir seç</div>
+  <div style="font-size:12px;color:#bbb;margin-top:6px">Yukarıdan şehir ekle — müşteriler ve hedefler otomatik listelenir</div>
+</div>
+`}
+<div style="height:20px"></div>
+`;
+}
+
+function initDayCfg(day){
+  if(!state.routeConfig[day]) state.routeConfig[day]={cities:[],extra:[],selCustomers:{},selPotentials:{}};
+  if(!state.routeConfig[day].selCustomers) state.routeConfig[day].selCustomers={};
+  if(!state.routeConfig[day].selPotentials) state.routeConfig[day].selPotentials={};
+  if(!state.routeConfig[day].extra) state.routeConfig[day].extra=[];
+}
+
+function addRouteCity(day,city){
+  initDayCfg(day);
+  if(!state.routeConfig[day].cities.includes(city))
+    state.routeConfig[day].cities.push(city);
+  state.citySearchStr='';
+  renderRoutes(document.getElementById('content'));
+}
+
+function removeRouteCity(day,city){
+  initDayCfg(day);
+  state.routeConfig[day].cities=state.routeConfig[day].cities.filter(c=>c!==city);
+  renderRoutes(document.getElementById('content'));
+}
+
+function toggleCust(day,id,val){
+  initDayCfg(day);
+  state.routeConfig[day].selCustomers[id]=val;
+  renderRoutes(document.getElementById('content'));
+}
+
+function togglePot(day,id,val){
+  initDayCfg(day);
+  state.routeConfig[day].selPotentials[id]=val;
+  renderRoutes(document.getElementById('content'));
+}
+
+function selectAllCustomers(day){
+  initDayCfg(day);
+  const cities=state.routeConfig[day].cities;
+  CUSTOMERS.filter(c=>cities.includes(c.city)).forEach(c=>state.routeConfig[day].selCustomers[c.id]=true);
+  renderRoutes(document.getElementById('content'));
+}
+function deselectAllCustomers(day){
+  initDayCfg(day);
+  const cities=state.routeConfig[day].cities;
+  CUSTOMERS.filter(c=>cities.includes(c.city)).forEach(c=>state.routeConfig[day].selCustomers[c.id]=false);
+  renderRoutes(document.getElementById('content'));
+}
+function selectAllPots(day){
+  initDayCfg(day);
+  const cities=state.routeConfig[day].cities;
+  const allPots=[...POTENTIALS,...manualPotentials];
+  allPots.filter(p=>cities.includes(p.city)&&p.cat!=='🔔 Uyandırılacak Müşteriler').forEach(p=>state.routeConfig[day].selPotentials[p.id]=true);
+  renderRoutes(document.getElementById('content'));
+}
+function deselectAllPots(day){
+  initDayCfg(day);
+  const cities=state.routeConfig[day].cities;
+  const allPots=[...POTENTIALS,...manualPotentials];
+  allPots.filter(p=>cities.includes(p.city)&&p.cat!=='🔔 Uyandırılacak Müşteriler').forEach(p=>state.routeConfig[day].selPotentials[p.id]=false);
+  renderRoutes(document.getElementById('content'));
+}
+
+function addExtraCustomer(day){
+  initDayCfg(day);
+  var val=document.getElementById('extra-inp')?document.getElementById('extra-inp').value.trim():'';
+  if(!val) return;
+  state.routeConfig[day].extra.push(val);
+  renderRoutes(document.getElementById('content'));
+}
+
+function removeExtra(day,idx){
+  initDayCfg(day);
+  state.routeConfig[day].extra.splice(idx,1);
+  renderRoutes(document.getElementById('content'));
+}
+
+function sendRouteMail(day){
+  initDayCfg(day);
+  const cfg=state.routeConfig[day];
+  const cities=cfg.cities;
+  if(!cities.length){alert('Önce en az bir şehir seç!');return;}
+
+  const sc=cfg.selCustomers||{};
+  const sp=cfg.selPotentials||{};
+  const allPots=[...POTENTIALS,...manualPotentials];
+
+  let body='KOENIGS DRINKS — '+day.toUpperCase()+' ROTA RAPORU\n';
+  body+='Tarih: '+new Date().toLocaleDateString('de-DE')+'\n';
+  body+='Şehirler: '+cities.join(', ')+'\n';
+  body+='='.repeat(50)+'\n';
+
+  // Seçili müşteriler
+  const selCusts=CUSTOMERS.filter(c=>cities.includes(c.city)&&sc[c.id]!==false);
+  if(selCusts.length){
+    body+='\nMÜŞTERİLER ('+selCusts.length+' seçili)\n'+'-'.repeat(40)+'\n';
+    cities.forEach(function(city){
+      const cc=selCusts.filter(c=>c.city===city);
+      if(!cc.length) return;
+      body+='\n📍 '+city+'\n';
+      cc.forEach(function(c){
+        body+='  • '+c.name+'\n';
+        if(c.plz) body+='    PLZ: '+c.plz+' '+c.city+'\n';
+        if(c.phone) body+='    Tel: '+c.phone+'\n';
+        const od=OD[c.id];
+        if(od){
+          body+='    Son Sipariş: '+od.d+' ('+od.g+' gün önce)\n';
+          body+='    Toplam Ciro: '+od.c.toLocaleString()+' €  |  '+od.s+' fatura  |  Ort. '+od.a+' günde bir\n';
+        }
+        const vis=(state.visits[c.id]||[]);
+        if(vis.length){
+          body+='    Ziyaret Notları:\n';
+          vis.forEach(function(v){
+            body+='      ['+v.date+'] '+v.result+(v.note?' — '+v.note:'')+'\n';
+          });
+        }
+        body+='\n';
+      });
+    });
+  }
+
+  // Seçili potansiyeller
+  const selPots=allPots.filter(p=>cities.includes(p.city)&&p.cat!=='🔔 Uyandırılacak Müşteriler'&&sp[p.id]!==false);
+  if(selPots.length){
+    body+='\nPOTANSİYEL HEDEFLER ('+selPots.length+' seçili)\n'+'-'.repeat(40)+'\n';
+    cities.forEach(function(city){
+      const pp=selPots.filter(p=>p.city===city);
+      if(!pp.length) return;
+      body+='\n📍 '+city+'\n';
+      pp.forEach(function(p){
+        body+='  ★ ['+p.prio+'] '+p.name+' — '+p.cat+'\n';
+        if(p.addr) body+='    Adres: '+p.addr+'\n';
+        if(p.phone) body+='    Tel: '+p.phone+'\n';
+        if(p.email) body+='    E-Mail: '+p.email+'\n';
+        if(p.contact) body+='    Kişi: '+p.contact+'\n';
+        if(p.note) body+='    Not: '+p.note+'\n';
+        body+='\n';
+      });
+    });
+  }
+
+  if(cfg.extra&&cfg.extra.length){
+    body+='\nEKSTRA NOTLAR\n'+'-'.repeat(40)+'\n';
+    cfg.extra.forEach(function(e){body+='  • '+e+'\n';});
+  }
+
+  body+='\n---\nKoenigs Drinks CRM | bertan.unsal@koenigs-drinks.de';
+
+  const sub='Koenigs '+day+' Rotası — '+cities.join(', ')+' — '+new Date().toLocaleDateString('de-DE');
+  window.open('mailto:bertan.unsal@koenigs-drinks.de?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body));
+}
+
+// ---- PRODUCTS (rakı + şarap) ----
+const RAKI=[
+  {brand:'Efe',name:'Oak Barrel',vol:'70cl',alc:'45%',price:39.00,caseQty:3,casePrice:117.00},
+  {brand:'Sarı Zeybek',name:'3 Meşe',vol:'70cl',alc:'45%',price:23.49,caseQty:12,casePrice:281.88},
+  {brand:'Sarı Zeybek',name:'3 Meşe',vol:'35cl',alc:'45%',price:13.99,caseQty:24,casePrice:335.76},
+  {brand:'Sarı Zeybek',name:'Original',vol:'70cl',alc:'45%',price:19.69,caseQty:12,casePrice:236.28},
+  {brand:'Sarı Zeybek',name:'Original',vol:'35cl',alc:'45%',price:11.69,caseQty:24,casePrice:280.56},
+  {brand:'Efe',name:'Göbek',vol:'70cl',alc:'45%',price:19.69,caseQty:6,casePrice:118.14},
+  {brand:'Efe',name:'Göbek',vol:'35cl',alc:'45%',price:11.69,caseQty:12,casePrice:140.28},
+  {brand:'Efe',name:'Gold',vol:'70cl',alc:'45%',price:13.39,caseQty:6,casePrice:80.34},
+  {brand:'Efe',name:'Gold',vol:'35cl',alc:'45%',price:7.69,caseQty:12,casePrice:92.28},
+  {brand:'Efe',name:'Yeşil',vol:'70cl',alc:'45%',price:11.79,caseQty:6,casePrice:70.74},
+  {brand:'Efe',name:'Yeşil',vol:'35cl',alc:'45%',price:6.99,caseQty:12,casePrice:83.88},
+  {brand:'Beylerbeyi',name:'Göbek',vol:'70cl',alc:'45%',price:24.49,caseQty:12,casePrice:293.88},
+  {brand:'Beylerbeyi',name:'Göbek',vol:'35cl',alc:'45%',price:13.99,caseQty:12,casePrice:167.88},
+  {brand:'Beylerbeyi',name:'Göbek',vol:'20cl',alc:'45%',price:8.99,caseQty:24,casePrice:215.76},
+  {brand:'Tekirdağ',name:'Rakısı',vol:'70cl',alc:'45%',price:15.80,caseQty:12,casePrice:189.60},
+  {brand:'Tekirdağ',name:'Rakısı',vol:'35cl',alc:'45%',price:9.28,caseQty:6,casePrice:55.68},
+  {brand:'Tekirdağ',name:'Gold',vol:'70cl',alc:'45%',price:20.49,caseQty:6,casePrice:122.94},
+  {brand:'Tekirdağ',name:'Gold',vol:'35cl',alc:'45%',price:12.49,caseQty:12,casePrice:149.88},
+  {brand:'Tekirdağ',name:'Gold',vol:'20cl',alc:'45%',price:7.79,caseQty:24,casePrice:186.96},
+  {brand:'Tekirdağ',name:'No.10',vol:'70cl',alc:'48%',price:28.45,caseQty:6,casePrice:170.70},
+  {brand:'Tekirdağ',name:'Göbek',vol:'70cl',alc:'45%',price:23.90,caseQty:6,casePrice:143.40},
+  {brand:'Tekirdağ',name:'Göbek',vol:'35cl',alc:'45%',price:14.85,caseQty:12,casePrice:178.20},
+  {brand:'Yeni Rakı',name:'1937',vol:'70cl',alc:'45%',price:13.99,caseQty:6,casePrice:83.94},
+  {brand:'Yeni Rakı',name:'1937',vol:'35cl',alc:'45%',price:8.49,caseQty:12,casePrice:101.88},
+  {brand:'Yeni Rakı',name:'1937',vol:'20cl',alc:'45%',price:4.92,caseQty:24,casePrice:118.08},
+  {brand:'Yeni Rakı',name:'Yeni Seri',vol:'70cl',alc:'45%',price:16.99,caseQty:6,casePrice:101.94},
+  {brand:'Yeni Rakı',name:'Yeni Seri',vol:'35cl',alc:'45%',price:9.59,caseQty:12,casePrice:115.08},
+  {brand:'Yeni Rakı',name:'Ala',vol:'70cl',alc:'47%',price:21.90,caseQty:6,casePrice:131.40},
+  {brand:'Kulüp',name:'Deluxe',vol:'70cl',alc:'45%',price:23.90,caseQty:6,casePrice:143.40}
+];
+
+const WINE=[
+  {brand:'Urla',name:'Tempus',grape:'Merlot-Syrah-Cab.Sauv-Cab.Franc-P.Verdot',vol:'75cl',alc:'14.5%',price:36.99,caseQty:6,casePrice:221.94},
+  {brand:'Urla',name:"Nero d'Avola / Urla Karası",grape:"Nero d'Avola",vol:'75cl',alc:'15%',price:36.99,caseQty:6,casePrice:221.94},
+  {brand:'Urla',name:'Nexus',grape:"Merlot-Nero d'Avola-Cab.Franc",vol:'75cl',alc:'15%',price:22.90,caseQty:6,casePrice:137.40},
+  {brand:'Urla',name:'Vourla',grape:'Cab.Sauv-Merlot-Syrah',vol:'75cl',alc:'14%',price:16.90,caseQty:6,casePrice:101.40},
+  {brand:'Urla',name:'Symposium',grape:'Dömi-Sek Bornova Misketi',vol:'50cl',alc:'13%',price:13.90,caseQty:6,casePrice:83.40},
+  {brand:'Urla',name:'Boğazkere',grape:'Boğazkere',vol:'75cl',alc:'14.5%',price:19.90,caseQty:6,casePrice:119.40},
+  {brand:'Yedibilgeler',name:'Pythagoras',grape:'Cab.Sauv-Merlot-Cab.Franc-P.Verdot',vol:'75cl',alc:'15%',price:16.90,caseQty:12,casePrice:202.80},
+  {brand:'Yedibilgeler',name:'Solon Attica',grape:'Malbec',vol:'75cl',alc:'14.5%',price:14.90,caseQty:12,casePrice:178.80},
+  {brand:'Yedibilgeler',name:'Thales',grape:'Öküzgözü-Petit Verdot',vol:'75cl',alc:'14.5%',price:13.90,caseQty:12,casePrice:166.80},
+  {brand:'Yedibilgeler',name:'Hippokrates',grape:'Cab.Sauv-Merlot-Cab.Franc-Shiraz',vol:'75cl',alc:'14.5%',price:12.90,caseQty:12,casePrice:154.80},
+  {brand:'Yedibilgeler',name:'Khilon',grape:'Sauvignon Blanc',vol:'75cl',alc:'13%',price:12.90,caseQty:12,casePrice:154.80},
+  {brand:'Yedibilgeler',name:'Anaxagoras',grape:'Chardonnay',vol:'75cl',alc:'13%',price:12.90,caseQty:12,casePrice:154.80},
+  {brand:'Yedibilgeler',name:'Lasos',grape:'Öküzgözü-Shiraz',vol:'75cl',alc:'14%',price:12.90,caseQty:12,casePrice:154.80},
+  {brand:'Lucien Arkas',name:'Meandros',grape:'Cab.Sauv-Syrah-Marselan-Merlot',vol:'75cl',alc:'15%',price:29.00,caseQty:6,casePrice:174.00},
+  {brand:'Lucien Arkas',name:'Consensus Chardonnay',grape:'Chardonnay',vol:'75cl',alc:'14%',price:16.90,caseQty:6,casePrice:101.40},
+  {brand:'Lucien Arkas',name:'Consensus Kırmızı',grape:'Syrah-Cab.Sauv-Merlot',vol:'75cl',alc:'14%',price:16.90,caseQty:6,casePrice:101.40},
+  {brand:'Lucien Arkas',name:"Mon Rêve Öküzgözü",grape:'Öküzgözü',vol:'75cl',alc:'14%',price:10.99,caseQty:6,casePrice:65.94},
+  {brand:'Lucien Arkas',name:"Mon Rêve Chardonnay",grape:'Chardonnay-Chenin Blanc',vol:'75cl',alc:'14%',price:10.99,caseQty:6,casePrice:65.94},
+  {brand:'Lucien Arkas',name:'Symrna Cab.Sauv',grape:'Cabernet Sauvignon',vol:'75cl',alc:'14%',price:6.70,caseQty:6,casePrice:40.20},
+  {brand:'Lucien Arkas',name:'Symrna Sauvignon Blanc',grape:'Sauv.Blanc-Trebbiano',vol:'75cl',alc:'13.5%',price:6.70,caseQty:6,casePrice:40.20},
+  {brand:'Ament',name:'Cabernet Sauvignon',grape:'Cabernet Sauvignon',vol:'75cl',alc:'14%',price:29.00,caseQty:6,casePrice:174.00},
+  {brand:'Ament',name:'Cabernet Franc',grape:'Cabernet Franc',vol:'75cl',alc:'14.5%',price:29.00,caseQty:6,casePrice:174.00},
+  {brand:'Ament',name:'Blend',grape:'Blend',vol:'75cl',alc:'14%',price:29.00,caseQty:6,casePrice:174.00},
+  {brand:'Porta Caeli',name:'Pacem Sauvignon Blanc',grape:'Sauvignon Blanc',vol:'75cl',alc:'13%',price:19.80,caseQty:6,casePrice:118.80},
+  {brand:'Porta Caeli',name:'2022 Cab.Franc-P.Verdot',grape:'Cabernet Franc-Petit Verdot',vol:'75cl',alc:'14%',price:44.90,caseQty:6,casePrice:269.40},
+  {brand:'Porta Caeli',name:'Felici Cab.Sauv',grape:'Cabernet Sauvignon',vol:'75cl',alc:'14%',price:13.90,caseQty:6,casePrice:83.40},
+  {brand:'Porta Caeli',name:'Sestos',grape:'Kalecik Karası-Öküzgözü-Boğazkere',vol:'75cl',alc:'13%',price:28.90,caseQty:6,casePrice:173.40},
+  {brand:'Mystic Muse',name:'Çilek Şarabı',grape:'Strawberry Wine',vol:'75cl',alc:'12%',price:7.90,caseQty:6,casePrice:47.40}
+];
+
+
+
+function renderProducts(el){
+  const items=state.prodTab==='raki'?RAKI:WINE;
+  const brands=[...new Set(items.map(p=>p.brand))];
+  el.innerHTML=`
+<div class="prod-tabs">
+  <button class="prod-tab${state.prodTab==='raki'?' on':''}" onclick="state.prodTab='raki';render()">🥃 Rakı</button>
+  <button class="prod-tab${state.prodTab==='wine'?' on':''}" onclick="state.prodTab='wine';render()">🍷 Türk Şarap</button>
+</div>
+${brands.map(brand=>{
+  const bi=items.filter(p=>p.brand===brand);
+  return `<div class="section-label">${brand}</div>
+<div style="padding:0 16px">${bi.map(p=>`<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="flex:1;margin-right:12px">
+      <div style="font-size:13px;font-weight:600">${p.name} <span style="font-weight:400;color:#bbb;font-size:12px">${p.vol}</span></div>
+      ${p.grape?`<div style="font-size:12px;color:#888;margin-top:2px">${p.grape}</div>`:''}
+      <div style="font-size:11px;color:#bbb;margin-top:2px">Alc. ${p.alc} · ${p.caseQty}x / koli</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:15px;font-weight:600;color:#6B2D3E">${p.price.toFixed(2)} €</div>
+      <div style="font-size:11px;color:#bbb">${p.casePrice.toFixed(2)} € / koli</div>
+    </div>
+  </div>
+</div>`).join('')}</div>`;
+}).join('')}`;
+}
+
+// ---- POTENTIALS ----
+const POT_CATS=['Tümü',...[...new Set([...POTENTIALS,...manualPotentials].map(p=>p.cat))]];
+const POT_PRIOS=['Tümü','A','B','C'];
+const STATUS_STYLES={'Aranmadı':{bg:'#f1efe8',c:'#5f5e5a'},'İletişime Geçildi':{bg:'#faeeda',c:'#854f0b'},'İlgileniyor':{bg:'#e1f5ee',c:'#0f6e56'},'Takipte':{bg:'#e6f1fb',c:'#185fa5'},'Aktif Müşteri':{bg:'#eaf3de',c:'#3b6d11'}};
+let potState={...POTENTIALS.reduce((a,p)=>({...a,[p.id]:p.status}),{})};
+
+function renderPotentials(el){
+  const sr=state.potSearch.toLowerCase();
+  const allPots=[...POTENTIALS,...manualPotentials];
+  const dormant=allPots.filter(p=>p.cat==='🔔 Uyandırılacak Müşteriler'&&(potState[p.id]||p.status)!=='Aktif Müşteri');
+  const targets=allPots.filter(p=>p.cat!=='🔔 Uyandırılacak Müşteriler'&&(potState[p.id]||p.status)!=='Aktif Müşteri');
+
+  var filtered;
+  if(state.potView==='dormant'){
+    filtered=dormant.filter(p=>{
+      const srOk=!sr||p.name.toLowerCase().includes(sr)||p.city.toLowerCase().includes(sr);
+      return srOk;
+    });
+  } else {
+    filtered=targets.filter(p=>{
+      const catOk=state.potCat==='Tümü'||p.cat===state.potCat;
+      const prioOk=state.potPrio==='Tümü'||p.prio===state.potPrio;
+      const srOk=!sr||p.name.toLowerCase().includes(sr)||p.city.toLowerCase().includes(sr)||p.note.toLowerCase().includes(sr)||(p.contact||'').toLowerCase().includes(sr);
+      return catOk&&prioOk&&srOk;
+    });
+  }
+  const aCount=filtered.filter(p=>p.prio==='A').length;
+  const targetCats=['Tümü',...[...new Set(targets.map(p=>p.cat))]];
+
+  el.innerHTML=`
+<div style="background:#fff;border-bottom:1px solid #e8e6df;display:flex;flex-shrink:0">
+  <button onclick="state.potView='targets';state.potSearch='';renderPotentials(document.getElementById('content'))" style="flex:1;padding:11px 8px;font-size:12px;font-weight:${state.potView==='targets'?'600':'400'};border:none;border-bottom:${state.potView==='targets'?'2.5px solid #6B2D3E':'2.5px solid transparent'};background:none;cursor:pointer;color:${state.potView==='targets'?'#6B2D3E':'#888'}">🎯 Potansiyel (${targets.length})</button>
+  <button onclick="state.potView='dormant';state.potSearch='';renderPotentials(document.getElementById('content'))" style="flex:1;padding:11px 8px;font-size:12px;font-weight:${state.potView==='dormant'?'600':'400'};border:none;border-bottom:${state.potView==='dormant'?'2.5px solid #e24b4a':'2.5px solid transparent'};background:none;cursor:pointer;color:${state.potView==='dormant'?'#e24b4a':'#888'}">🔔 Sessiz Müşteri (${dormant.length})</button>
+</div>
+<div class="search-bar">
+  <input type="text" placeholder="${state.potView==='dormant'?'Sessiz müşteri ara…':'Hedef ara — firma, şehir, kişi…'}" value="${state.potSearch}" oninput="state.potSearch=this.value;renderPotentials(document.getElementById('content'))">
+</div>
+${state.potView==='targets'?`
+<div class="pills" id="pot-pills">${targetCats.map(c=>`<button class="pill${state.potCat===c?' on':''}" onclick="state.potCat='${c}';render()">${c}</button>`).join('')}<span style="display:inline-block;width:20px"></span></div>
+<div style="display:flex;gap:6px;padding:8px 16px;background:#fff;border-bottom:1px solid #e8e6df;overflow-x:auto;white-space:nowrap;-ms-overflow-style:none;scrollbar-width:none">
+  ${['Tümü','A','B','C'].map(p=>`<button class="pill${state.potPrio===p?' on':''}" onclick="state.potPrio='${p}';render()" style="${p==='A'?'border-color:#e24b4a;'+(state.potPrio==='A'?'background:#e24b4a;color:#fff;':''):''}${p==='B'?'border-color:#ba7517;'+(state.potPrio==='B'?'background:#ba7517;color:#fff;':''):''}">${p==='Tümü'?'Tüm Öncelikler':'Öncelik '+p}</button>`).join('')}<span style="display:inline-block;width:20px"></span>
+</div>`:''}
+<div style="padding:8px 16px;font-size:12px;color:#999">${filtered.length} kayıt${state.potView==='targets'?' · '+aCount+' öncelik A':' · son 6 ayda sipariş yok'}</div>
+<div style="padding:0 16px">
+${filtered.map(p=>{
+  const st=potState[p.id]||p.status;
+  const sts=STATUS_STYLES[st]||STATUS_STYLES['Aranmadı'];
+  if(state.potView==='dormant'){
+    const isDormant=p.name.includes('⚠️');
+    const borderCol=isDormant?'#e24b4a':'#ba7517';
+    return `<div class="card" style="border-left:3px solid ${borderCol}">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;margin-bottom:2px">${p.name.replace('🔔 ','').replace('⚠️ ','')}</div>
+      <div style="font-size:12px;color:#888">${p.city}</div>
+      <div style="font-size:12px;color:#aaa;margin-top:4px;font-style:italic">${p.note}</div>
+    </div>
+    <select class="badge-status" onchange="potState[${p.id}]=this.value;savePotStatusToSheets(${p.id},this.value);renderPotentials(document.getElementById('content'))" style="background:${sts.bg};color:${sts.c};border:1px solid ${sts.c}30;flex-shrink:0">
+      ${Object.keys(STATUS_STYLES).map(s=>`<option${st===s?' selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>
+</div>`;
+  }
+  return `<div class="card prio-${p.prio.toLowerCase()}">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:700">${p.name}</span>
+        <span class="badge badge-${p.prio.toLowerCase()}">${p.prio}</span>
+        ${p.nrw?'<span class="badge badge-nrw">NRW</span>':''}
+      </div>
+      <div style="font-size:12px;color:#888;margin-bottom:4px">${p.city}${p.standorte?` · ${p.standorte}`:''}</div>
+      ${p.addr?`<div class="contact-row"><span class="contact-key">Adres</span><span class="contact-val">${p.addr}</span></div>`:''}
+      ${p.phone?`<div class="contact-row"><span class="contact-key">Tel</span><span class="contact-val"><a href="tel:${p.phone}">${p.phone}</a></span></div>`:''}
+      ${p.email?`<div class="contact-row"><span class="contact-key">E-Mail</span><span class="contact-val"><a href="mailto:${p.email}">${p.email}</a></span></div>`:''}
+      ${p.contact?`<div class="contact-row"><span class="contact-key">Kişi</span><span class="contact-val">${p.contact}</span></div>`:''}
+      ${p.buying?`<div class="contact-row"><span class="contact-key">İletişim</span><span class="contact-val">${p.buying}</span></div>`:''}
+      <div style="font-size:12px;color:#aaa;margin-top:6px;font-style:italic">${p.note}</div>
+    </div>
+    <select class="badge-status" onchange="potState[${p.id}]=this.value;savePotStatusToSheets(${p.id},this.value);renderPotentials(document.getElementById('content'))" style="background:${sts.bg};color:${sts.c};border:1px solid ${sts.c}30;flex-shrink:0;max-width:108px">
+      ${Object.keys(STATUS_STYLES).map(s=>`<option${st===s?' selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>
+</div>`;
+}).join('')}
+${state.potView==='targets'?`${state.showAddForm?`
+<div class="card" style="border-left:3px solid #6B2D3E;margin-top:4px">
+  <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#6B2D3E">+ Yeni Hedef Ekle</div>
+  <div class="form-row"><label class="form-label">Ad / Firma *</label><input type="text" id="nf-name" placeholder="Örn: Restaurant Athen"></div>
+  <div class="form-row"><label class="form-label">Şehir *</label><input type="text" id="nf-city" placeholder="Örn: Köln"></div>
+  <div class="form-row"><label class="form-label">Adres</label><input type="text" id="nf-addr" placeholder="Hauptstr. 12, 50667 Köln"></div>
+  <div class="form-row"><label class="form-label">Telefon</label><input type="text" id="nf-phone" placeholder="0221 123456"></div>
+  <div class="form-row"><label class="form-label">E-Mail</label><input type="text" id="nf-email" placeholder="info@..."></div>
+  <div class="form-row"><label class="form-label">Kategori</label>
+    <select id="nf-cat">
+      <option>🍽 Restoranlar</option><option>🥩 Steakhauslar</option>
+      <option>🛒 Kiosk & Market</option><option>🍷 Wein-Depot & Şarap Evleri</option>
+      <option>🏪 Grosshandel & Online</option>
+    </select></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="form-row"><label class="form-label">Öncelik</label>
+      <select id="nf-prio"><option value="A">A — Yüksek</option><option value="B" selected>B — Orta</option><option value="C">C — Düşük</option></select></div>
+    <div class="form-row"><label class="form-label">NRW?</label>
+      <select id="nf-nrw"><option value="true">Evet</option><option value="false" selected>Hayır</option></select></div>
+  </div>
+  <div class="form-row"><label class="form-label">Not</label><textarea id="nf-note" rows="2" placeholder="Kısa not..."></textarea></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-save" onclick="saveNewPotential()">Kaydet</button>
+    <button class="btn-ghost" onclick="state.showAddForm=false;renderPotentials(document.getElementById(\'content\'))">İptal</button>
+  </div>
+</div>`:`<button onclick="state.showAddForm=true;renderPotentials(document.getElementById(\'content\'))" style="width:100%;padding:12px;font-size:13px;font-weight:500;border:1px dashed #c0bdb5;border-radius:10px;background:none;cursor:pointer;color:#888;font-family:inherit;margin-top:4px">+ Yeni Hedef Ekle</button>`}`:''}
+<div style="height:20px"></div>
+</div>`;
+}
+
+function saveNewPotential(){
+  var name=document.getElementById('nf-name').value.trim();
+  var city=document.getElementById('nf-city').value.trim();
+  if(!name||!city){alert('Ad ve şehir zorunlu!');return;}
+  var entry={
+    id:nextManualId++,
+    cat:document.getElementById('nf-cat').value,
+    name:name,city:city,
+    addr:document.getElementById('nf-addr').value.trim(),
+    phone:document.getElementById('nf-phone').value.trim(),
+    email:document.getElementById('nf-email').value.trim(),
+    contact:'',buying:'Yerinde ziyaret',
+    note:document.getElementById('nf-note').value.trim(),
+    prio:document.getElementById('nf-prio').value,
+    status:'Aranmadı',
+    nrw:document.getElementById('nf-nrw').value==='true'
+  };
+  manualPotentials.push(entry);
+  potState[entry.id]=entry.status;
+  saveManualPotToSheets(entry);
+  state.showAddForm=false;
+  renderPotentials(document.getElementById('content'));
+}
+
+// ====== INIT ======
+render();
+loadFromSheets();
+</script>
+</body>
+</html>
